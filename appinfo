@@ -1,0 +1,8 @@
+[app]
+id=minipos
+name=MiniPos
+bin=MiniPos
+artwork=
+desc=PAX POS Application
+vender=PAX
+version=2.0

@@ -1,0 +1,1 @@
+{"external_id": "ABC-123", "terminal_id":11111111, "waiter_id": "007", "order_lines": [{"quantity": 2, "price": 40.0, "product_id": 7}, {"quantity": 2, "price": 40.0, "product_id": 8}, {"quantity": 2, "price": 40.0, "product_id": 9}]}
