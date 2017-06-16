@@ -179,6 +179,14 @@ int settle_keypad_btn_ensure_text_y() {return (settle_keypad_btn_height()-settle
 int settle_keypad_btn_ensure_refresh()
 {
 	XuiWindow *btn=settle_keypad_btn_index(settle_keypad_btn_ensure_btn_list_index());
+	if(settle_product_count() == 0)
+	{
+		XuiShowWindow(btn,XUI_HIDE,0);
+	}
+	else
+	{
+		XuiShowWindow(btn,XUI_SHOW,0);
+	}
 	XuiButtonSetKey(btn,settle_keypad_btn_ensure_key());
 	//set btn view
 	XuiButtonStat stat;memset(&stat,0,sizeof(stat));

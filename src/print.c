@@ -157,7 +157,7 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
 			strcpy(printBuff,"CASH:");
 			break;
 		case M2M_PAYMENT_TYPE_VOUCHER:
-			strcpy(printBuff,"VOUCHER CARD:");
+			strcpy(printBuff,"CASH CARD:");
 			break;
 			default:
 			strcpy(printBuff,"NO PAYMENT TYPE");

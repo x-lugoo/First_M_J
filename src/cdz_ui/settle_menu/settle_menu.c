@@ -106,10 +106,13 @@ int settle_menu_process()
 			s_settle_menu_ret_value=page_code_back();
 			break;
 		}
-		if (page_code==page_code_ensure()) {
+		if (page_code==page_code_ensure() && settle_product_count() != 0) {
 			s_settle_menu_ret_value=page_code_ensure();
 			
 			break;
+		}
+		else if(page_code==page_code_ensure() && settle_product_count() == 0) {
+		  PaxLog(LOG_INFO,"Invaild enter key ");
 		}
 		if(page_code >= 100000)
 		{

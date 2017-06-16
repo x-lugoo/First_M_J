@@ -40,12 +40,15 @@ int main(void)
 		 		iRet = ProcessPaymentResult(glMainAppData.paymentResult);
 		 		if(iRet == START_SHOW_MAINAPP_MENU)
 		 		{
+		 			PaxLog(LOG_INFO,"---Checked the function key---fun:%s,line:%d",__FUNCTION__,__LINE__);
 		 			memset(&glMiniPosData, 0, sizeof(struct miniposToMainapp));
 		 			glMiniPosData.wakeUpReason = MINI_WAKEUP_SHOWMENU;
     				SaveMiniDataForMain(&glMiniPosData);
+    				PaxLog(LOG_INFO,"---Have sent Messages to Mainapp,prepare to exit(),---fun:%s,line:%d",__FUNCTION__,__LINE__);
 		 		}
 		 		else if(iRet)
 		 		{
+		 			DestroyDisplay();
 		 			return iRet;
 		 		}
 		 		break;
@@ -65,13 +68,17 @@ int main(void)
 		 		iRet = ProcessStartUp();
 		 		if(iRet == START_SHOW_MAINAPP_MENU) //press func key
 		 		{
+		 			PaxLog(LOG_INFO,"---Checked the function key---fun:%s,line:%d",__FUNCTION__,__LINE__);
 		 			memset(&glMiniPosData, 0, sizeof(struct miniposToMainapp));
 		 			glMiniPosData.wakeUpReason = MINI_WAKEUP_SHOWMENU;
     				SaveMiniDataForMain(&glMiniPosData);
+    				PaxLog(LOG_INFO,"---Have sent Messages to Mainapp,prepare to exit(),---fun:%s,line:%d",__FUNCTION__,__LINE__);
 		 		}
 		 		else if(iRet)
 		 		{
 					DisplayPrompt("ERROR", "startup error", MSGTYPE_SUCCESS, 0);
+					HidePromptWin();
+		 			DestroyDisplay();
 					return ABNORMAL_EXIT;
 				}
 				break;
