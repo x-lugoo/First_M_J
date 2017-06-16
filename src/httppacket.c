@@ -20,7 +20,7 @@
 
 static char *spRetJson;
 
-int Get_Request_Json(char *pszJsonData, int iBufSize,REQUESTCMD ePackCmd)
+int GetRequestJson(char *pszJsonData, int iBufSize,REQUESTCMD ePackCmd)
 {
 	int iRet;
 
@@ -74,19 +74,19 @@ iUpdateJsonFlag:whether to update json data(when back-end return tag:update_cate
 *********************************************************/
 
 
-int Result_Process(long lRetcode, char *szRetJsonData,REQUESTCMD ePackCmd,int iUpdateJsonFlag)
+int ResultProcess(long lRetcode, char *szRetJsonData,REQUESTCMD ePackCmd,int iUpdateJsonFlag)
 {
 	int iRet;
 
-	Pax_Log(LOG_INFO, "entrying	,lRetcode=%d		%s - %d",lRetcode, __FUNCTION__, __LINE__);
+	PaxLog(LOG_INFO, "entrying	,lRetcode=%d		%s - %d",lRetcode, __FUNCTION__, __LINE__);
 	if(lRetcode == HTTP_AUTH_ERR)
 	{
-		Pax_Log(LOG_INFO, "%s - %d Http code = 401! Response", __FUNCTION__, __LINE__);
+		PaxLog(LOG_INFO, "%s - %d Http code = 401! Response", __FUNCTION__, __LINE__);
 		return lRetcode;
 	}
 	else if(lRetcode != HTTP_OK && lRetcode != HTTP_ERR)
 	{
-		Pax_Log(LOG_INFO, "%s - %d Http code = %d Response", __FUNCTION__, __LINE__,lRetcode);
+		PaxLog(LOG_INFO, "%s - %d Http code = %d Response", __FUNCTION__, __LINE__,lRetcode);
 		return lRetcode;
 	}
 	if(ePackCmd == CMD_UPLOAD_DATA)
@@ -106,7 +106,7 @@ int Result_Process(long lRetcode, char *szRetJsonData,REQUESTCMD ePackCmd,int iU
 	}
 	else if(ePackCmd == CMD_GET_TXNINFO)
 	{
-	 Pax_Log(LOG_ERROR,"iUpdateJsonFlag=%d %s,Line:%d",iUpdateJsonFlag,__FUNCTION__,__LINE__);
+	 PaxLog(LOG_ERROR,"iUpdateJsonFlag=%d %s,Line:%d",iUpdateJsonFlag,__FUNCTION__,__LINE__);
 		SaveUpdateJsonData(szRetJsonData,iUpdateJsonFlag);
 	}
 	else
@@ -116,7 +116,7 @@ int Result_Process(long lRetcode, char *szRetJsonData,REQUESTCMD ePackCmd,int iU
 	return 0;
 }
 
-int Base64_Encode(const char *szStr, int iStrLen, char *pszEncode, int iEncodeLen)
+int Base64Encode(const char *szStr, int iStrLen, char *pszEncode, int iEncodeLen)
 {
 	int iLen=0;
     BIO *bmem=NULL,*b64=NULL;
@@ -129,7 +129,7 @@ int Base64_Encode(const char *szStr, int iStrLen, char *pszEncode, int iEncodeLe
     BIO_flush(b64);
     BIO_get_mem_ptr(b64, &bptr);
     if( bptr->length > iEncodeLen ) {
-        Pax_Log( LOG_INFO, "encode_len too small\n" );
+        PaxLog( LOG_INFO, "encode_len too small\n" );
         return HTTPPACKET_ERR;
     }
     memcpy(pszEncode, bptr->data, bptr->length);
@@ -148,7 +148,7 @@ int Base64_Encode(const char *szStr, int iStrLen, char *pszEncode, int iEncodeLe
  * opad is the byte 0x5c repeated 64 times
  * and text is the data being protected
  */
-int Calculate_HMAC(const unsigned char *pucContent, int iContentLen,
+int CalculateHMAC(const unsigned char *pucContent, int iContentLen,
 		const unsigned char *pucapiKey, int iApiKeyLen, char *pszEncodeData, int iBufSize)
 {
 	int i=0, iLen=0;
@@ -195,7 +195,7 @@ int Calculate_HMAC(const unsigned char *pucContent, int iContentLen,
 	return iLen;
 }
 
-int Get_Time_Stamp_UTC_String(char *pszTimeStamp, int iBufSize)
+int GetTimeStampUTCString(char *pszTimeStamp, int iBufSize)
 {
 	int iLen=0;
 	time_t timep;
@@ -209,14 +209,14 @@ int Get_Time_Stamp_UTC_String(char *pszTimeStamp, int iBufSize)
 	timep = mktime(p);
 	iLen = snprintf((char *)pszTimeStamp, iBufSize, "%ld", timep);
 	if ( (iLen < 0) || (iLen >= iBufSize) ) {
-		Pax_Log(LOG_INFO, "%s - %d, snprintf Failed!", __FUNCTION__, __LINE__);
+		PaxLog(LOG_INFO, "%s - %d, snprintf Failed!", __FUNCTION__, __LINE__);
 		return OT_ERR;
 	}
 
 	return iLen;
 }
 
-int Get_Request_Url(char *szUrl, int iBufSize, REQUESTCMD ePackCmd)
+int GetRequestUrl(char *szUrl, int iBufSize, REQUESTCMD ePackCmd)
 {
 	int iLen=0;
 
@@ -225,16 +225,14 @@ int Get_Request_Url(char *szUrl, int iBufSize, REQUESTCMD ePackCmd)
 	}
 	if(CMD_GET_TXNINFO == ePackCmd)
 	{
-
-		iLen = snprintf(szUrl, iBufSize, "%s", "https://api.pos.goatms.com/api/v1/terminals/11111111/product-catalogue");
-
+		iLen = snprintf(szUrl, iBufSize, "https://api.pos.goatms.com/api/v1/terminals/%s/product-catalogue",(glMainAppData.terminalID));
 	}
 	else if(CMD_UPLOAD_DATA== ePackCmd)
 	{
 	 	iLen = snprintf(szUrl, iBufSize, "https://api.pos.goatms.com/api/v1/orders");
 	}
 	if ( (iLen < 0) || (iLen >= iBufSize) ) {
-		Pax_Log(LOG_INFO, "%s - %d, snprintf Failed!", __FUNCTION__, __LINE__);
+		PaxLog(LOG_INFO, "%s - %d, snprintf Failed!", __FUNCTION__, __LINE__);
 		return OT_ERR;
 	}
 	return iLen;
@@ -249,18 +247,18 @@ here,I don't use buffer_in,because the function will be executed once curl gets 
   or you can use Filestream on param buffer_in instead of spRetJson
 ********************************************************************************/
 //once has received data, the function will be executed,maybe exectute twice
-static int Get_Response_Json(void *data, size_t size, size_t nmemb, void *buffer_in) //callback function
+static int GetResponseJson(void *data, size_t size, size_t nmemb, void *buffer_in) //callback function
 {
 	
-	Pax_Log(LOG_INFO, "size =%d, nmemb=%d,%s--%d ",size,nmemb,__FUNCTION__, __LINE__);
+	PaxLog(LOG_INFO, "size =%d, nmemb=%d,%s--%d ",size,nmemb,__FUNCTION__, __LINE__);
 	memcpy(spRetJson,data,size * nmemb);
-	//Pax_Log(LOG_INFO,"spRetJson=%s",spRetJson);
+	//PaxLog(LOG_INFO,"spRetJson=%s",spRetJson);
 	spRetJson += size * nmemb;
     return size * nmemb;   //must return size * nmeme ,otherwise curl return 23
 }
 
 //static int Send_Recv_Process(char *pszUrl, char *pszAPIKey, char *pszJsonData, long *lRetcode, char *pszRetJsonData)
-static int Get_Put_Process(char *pszUrl, char *pszAPIKey, char *pszJsonData, long *lRetcode, char *pszRetJsonData, REQUESTCMD ePackCmd)
+static int GetPutProcess(char *pszUrl, char *pszAPIKey, char *pszJsonData, long *lRetcode, char *pszRetJsonData, REQUESTCMD ePackCmd)
 {
 	CURL *pCurl=NULL;
 	char szBuf[256] = {0};
@@ -272,13 +270,21 @@ static int Get_Put_Process(char *pszUrl, char *pszAPIKey, char *pszJsonData, lon
 		return OT_ERR_INVALID_PARAM;
 	}
     HidePromptWin();
-    Display_Prompt("UPLOADING", "Please wait while we Upload your products", MSGTYPE_UPLOADING, 0);
+    if(ePackCmd == CMD_GET_TXNINFO)
+    {
+    	DisplayPrompt("PLEASE WAIT", "Processing request...", MSGTYPE_UPLOADING, 0);
+    }
+    else if(ePackCmd == CMD_UPLOAD_DATA)
+    {
+    	 DisplayPrompt("PLEASE WAIT", "Processing request...", MSGTYPE_UPLOADING, 0);
+    }	
+   
 	spRetJson = pszRetJsonData;
-	Pax_Log(LOG_INFO, "%s - %d pszUrl = %s", __FUNCTION__, __LINE__, pszUrl);
-	Pax_Log(LOG_INFO, "%s - %d pszAPIKey = %s", __FUNCTION__, __LINE__, pszAPIKey);
+	PaxLog(LOG_INFO, "%s - %d pszUrl = %s", __FUNCTION__, __LINE__, pszUrl);
+	PaxLog(LOG_INFO, "%s - %d pszAPIKey = %s", __FUNCTION__, __LINE__, pszAPIKey);
 	if(CMD_UPLOAD_DATA == ePackCmd)
 	{
-		Pax_Log(LOG_INFO, "%s - %d new upload pszJsonData = %s", __FUNCTION__, __LINE__, pszJsonData);
+		PaxLog(LOG_INFO, "%s - %d new upload pszJsonData = %s", __FUNCTION__, __LINE__, pszJsonData);
 	}
 	pCurl = curl_easy_init();
 	if ( pCurl == NULL ) {
@@ -292,7 +298,7 @@ static int Get_Put_Process(char *pszUrl, char *pszAPIKey, char *pszJsonData, lon
 
 	if(ePackCmd == CMD_GET_TXNINFO)
 	{
-		curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, Get_Response_Json);//callback fun
+		curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, GetResponseJson);//callback fun
 		curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, szTemp);//szTemp no useud
 		
 	}
@@ -302,7 +308,7 @@ static int Get_Put_Process(char *pszUrl, char *pszAPIKey, char *pszJsonData, lon
 		//ptHeaders = curl_slist_append(ptHeaders, "Content-Type: application/json");
 		//curl_easy_setopt(pCurl, CURLOPT_HTTPHEADER, ptHeaders);
 		curl_easy_setopt(pCurl, CURLOPT_POST, 1);
-		curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, Get_Response_Json);//callback fun
+		curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, GetResponseJson);//callback fun
 		curl_easy_setopt(pCurl, CURLOPT_POSTFIELDS, pszJsonData);
 		curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, szTemp);//szTemp no useud
 	}
@@ -315,28 +321,28 @@ static int Get_Put_Process(char *pszUrl, char *pszAPIKey, char *pszJsonData, lon
 		curl_easy_setopt(pCurl, CURLOPT_SSL_VERIFYPEER, 0L);
 		curl_easy_setopt(pCurl, CURLOPT_SSL_VERIFYHOST, 2L); //modified by Kevin Liu 20160707, from 1L to 2L
 	}
-	Pax_Log(LOG_INFO, "new start to perfrom %s - %d", __FUNCTION__, __LINE__);
+	PaxLog(LOG_INFO, "new start to perfrom %s - %d", __FUNCTION__, __LINE__);
 	eRes = curl_easy_perform(pCurl);
 	
-	//Pax_Log(LOG_INFO, "pszRetJsonData=%s		%s - %d",pszRetJsonData, __FUNCTION__, __LINE__);
-	Pax_Log(LOG_INFO, "%s - %d eRes = %d", __FUNCTION__, __LINE__, eRes);
+	//PaxLog(LOG_INFO, "pszRetJsonData=%s		%s - %d",pszRetJsonData, __FUNCTION__, __LINE__);
+	PaxLog(LOG_INFO, "%s - %d eRes = %d", __FUNCTION__, __LINE__, eRes);
 	if ( eRes != CURLE_OK ) {
 		curl_easy_cleanup(pCurl);
 		return eRes;
 	}
 	eRes = curl_easy_getinfo(pCurl, CURLINFO_RESPONSE_CODE , lRetcode);
-	Pax_Log(LOG_INFO, "%s - %d eRes = %d,", __FUNCTION__, __LINE__, eRes);
+	PaxLog(LOG_INFO, "%s - %d eRes = %d,", __FUNCTION__, __LINE__, eRes);
 	if ( eRes != CURLE_OK ) {
 		curl_easy_cleanup(pCurl);
 		return eRes;
 	}
 	curl_easy_cleanup(pCurl);
 	
-	Pax_Log(LOG_INFO, "test end");
+	PaxLog(LOG_INFO, "test end");
 	return OT_OK;
 }
 
-int Request_Process(REQUESTCMD ePackCmd,int iUpdateJsonFlag)
+int RequestProcess(REQUESTCMD ePackCmd,int iUpdateJsonFlag)
 {
 
 	int iTimeStampLen;
@@ -358,23 +364,24 @@ int Request_Process(REQUESTCMD ePackCmd,int iUpdateJsonFlag)
 	memset(szRetJsonData,0,sizeof(szRetJsonData));
 	memset(szAPIKey,0,sizeof(szAPIKey));
 
-	iUrlLen = Get_Request_Url(szUrl,sizeof(szUrl),ePackCmd);  //get URL to connect to back_end host
+	strcpy(szAPIKey,"ZDI2YmZiODZkOTNhYzE4MjU1OGFlYjE4"); //apiKey is fixed is this project
+	iUrlLen = GetRequestUrl(szUrl,sizeof(szUrl),ePackCmd);  //get URL to connect to back_end host
 	if(iUrlLen < 0)
 	{
 		return OT_ERR;
 	}
-	iJsonDataLen = Get_Request_Json(szJsonData, sizeof(szJsonData),ePackCmd); //get request json data
+	iJsonDataLen = GetRequestJson(szJsonData, sizeof(szJsonData),ePackCmd); //get request json data
 	if(iJsonDataLen < 0)
 	{
 		return OT_ERR;
 	}
-	iTimeStampLen = Get_Time_Stamp_UTC_String(szTimeStamp,sizeof(szTimeStamp));//get local time
+	iTimeStampLen = GetTimeStampUTCString(szTimeStamp,sizeof(szTimeStamp));//get local time
 	if(iTimeStampLen < 0)
 	{
 		return OT_ERR;
 	}
-	strcpy(szAPIKey,"ZDI2YmZiODZkOTNhYzE4MjU1OGFlYjE4");
-	iRet = Get_Put_Process(szUrl, szAPIKey, szJsonData, &lRetcode, szRetJsonData, ePackCmd);
+	
+	iRet = GetPutProcess(szUrl, szAPIKey, szJsonData, &lRetcode, szRetJsonData, ePackCmd);
 	if(iRet)
 	{
 		if(ePackCmd == CMD_UPLOAD_DATA && access(FILE_REVERSAL,F_OK) >= 0)
@@ -383,20 +390,20 @@ int Request_Process(REQUESTCMD ePackCmd,int iUpdateJsonFlag)
 			iSaveFileRet = SaveFile(FILE_REVERSALFlAG,&glReverFlag,1);
 			if(iSaveFileRet)
 			{
-				Pax_Log(LOG_INFO,"iRet =%d			fun:%s-line:%d",iRet,__FUNCTION__,__LINE__);
+				PaxLog(LOG_INFO,"iRet =%d			fun:%s-line:%d",iRet,__FUNCTION__,__LINE__);
 				return iSaveFileRet;
 			}
 			
 		}
 		return iRet;
 	}
-	iRet = Result_Process(lRetcode, szRetJsonData,ePackCmd,iUpdateJsonFlag);
+	iRet = ResultProcess(lRetcode, szRetJsonData,ePackCmd,iUpdateJsonFlag);
 	if(iRet)
 	{
-		Pax_Log(LOG_INFO,"iRet =%d			fun:%s-line:%d",iRet,__FUNCTION__,__LINE__);
+		PaxLog(LOG_INFO,"iRet =%d			fun:%s-line:%d",iRet,__FUNCTION__,__LINE__);
 		return iRet;
 	}
-	Pax_Log(LOG_INFO,"removingFILE_REVERSAL	fun:%s-line:%d",__FUNCTION__,__LINE__);
+	PaxLog(LOG_INFO,"removingFILE_REVERSAL	fun:%s-line:%d",__FUNCTION__,__LINE__);
 	remove(FILE_REVERSAL);//process success,remove reversal data
 	return 0;
 }

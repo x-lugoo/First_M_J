@@ -187,17 +187,10 @@ static XuiImg *line_img()
 #undef LINE_CONFIG_AREA
  int settle_cur_page_draw_line()
 {
-	XuiImg *imgDottedline = XuiImgLoadFromFile(Add_Prefix_Res_Path("ga_dottedlinebl.png"));
+	XuiImg *imgDottedline = XuiImgLoadFromFile(AddPrefixResPath("ga_dottedlinebl.png"));
 	XuiCanvasDrawImg(settle_page_win(), settle_product_seperate_line_x(), settle_product_seperate_line_y(), XuiRootCanvas()->width - 38, 1,XUI_BG_CENTER, imgDottedline);	
 	return 0;
 }
- int payment_cur_page_draw_line()
-{
-	XuiImg *imgDottedline = XuiImgLoadFromFile(Add_Prefix_Res_Path("ga_dottedlinebl.png"));
-	XuiCanvasDrawImg(payment_page_win(), settle_product_seperate_line_x(), settle_product_seperate_line_y(), XuiRootCanvas()->width - 38, 1,XUI_BG_CENTER, imgDottedline);	
-	return 0;
-}
-
 
 static int settle_cur_page_clear_line()
 {
@@ -251,7 +244,7 @@ int DestorySelProductBut(int forceDestory)
 	   }
 		
 		glSelectPageBtnFlag = 0;
-		Pax_Log(LOG_INFO,"destory page");
+		PaxLog(LOG_INFO,"destory page");
 	}
 	
 	return 0;
@@ -259,7 +252,7 @@ int DestorySelProductBut(int forceDestory)
 
 int DestorySelButAndRefresh()  //强制清楚选择产品的按钮，并刷新界面
 {
-	Pax_Log(LOG_INFO,"hidehiset:%d",__LINE__);
+	PaxLog(LOG_INFO,"hidehiset:%d",__LINE__);
 	DestorySelProductBut(1);
 	set_settle_page_key(settle_page_btn_virtual_Text_key_base());
 	pthread_create(&selProductThread, NULL, SettleProductSel, NULL);
@@ -277,7 +270,7 @@ int settle_page_refresh()
 	int j;
 	int count=settle_page_btn_count();
 	char szGetText[100];
-	Pax_Log(LOG_INFO,"start to refresh");
+	PaxLog(LOG_INFO,"start to refresh");
 	DestorySelProductBut(0);
 	for (i=0;i!=count;++i) {
 		XuiWindow *btn=settle_page_btn(i);
@@ -286,7 +279,7 @@ int settle_page_refresh()
 		cur_line_btn_set_index(i);
 		void *node=settle_product_list_node(node_index);
 		if (node) {
-		      Pax_Log(LOG_INFO,"line=%d",__LINE__);
+		      PaxLog(LOG_INFO,"line=%d",__LINE__);
 			//set btn common stat
 			XuiButtonStat stat_common;
 			{
@@ -310,13 +303,13 @@ int settle_page_refresh()
 				
 				stat.btn_bg=create_xui_color(node_get_btn_bg_color(node));
 				XuiButtonSetStat(btn,XUI_BTN_NORMAL,&stat);
-				 Pax_Log(LOG_INFO,"line=%d",__LINE__);
+				 PaxLog(LOG_INFO,"line=%d",__LINE__);
 			}
 			
 			{//set btn pressed stat
 				XuiButtonStat stat;
 				memcpy(&stat,&stat_common,sizeof(XuiButtonStat));
-				 Pax_Log(LOG_INFO,"line=%d",__LINE__);
+				 PaxLog(LOG_INFO,"line=%d",__LINE__);
 				//stat.text_fg=create_xui_color(node_get_btn_text_color(node));
 				stat.text_fg=create_xui_color(0xff000000);
 				stat.btn_bg=create_xui_color(node_get_btn_bg_color_p(node));
@@ -328,17 +321,17 @@ int settle_page_refresh()
 			//画黑边
 			settle_cur_page_draw_line();
 			 //added by jeff 20170527
-			//Pax_Log(LOG_INFO,"get_settle_page_key()=%d",get_settle_page_key());
+			//PaxLog(LOG_INFO,"get_settle_page_key()=%d",get_settle_page_key());
 		#if 1
 		
-		     Pax_Log(LOG_INFO,"line=%d,i=%d,get_settle_page_key()=%d",__LINE__,i,get_settle_page_key());
+		     PaxLog(LOG_INFO,"line=%d,i=%d,get_settle_page_key()=%d",__LINE__,i,get_settle_page_key());
 			if((get_settle_page_key() >=  settle_page_btn_virtual_Plus_key_base() && get_settle_page_key() < settle_page_btn_virtual_Sub_key_base() && (i == (get_settle_page_key() - settle_page_btn_virtual_Plus_key_base())%5) ) ||
 			(get_settle_page_key() >= settle_page_btn_virtual_Sub_key_base() && (i == (get_settle_page_key() - settle_page_btn_virtual_Sub_key_base())%5) ) ||
 			(get_settle_page_key() >= settle_page_btn_virtual_key_base() && get_settle_page_key() < 20000 && (i == (get_settle_page_key() - 10000)%5) ) )
 			
 			{
 	  
-				Pax_Log(LOG_INFO,"start to gen button Line:%d",__LINE__);
+				PaxLog(LOG_INFO,"start to gen button Line:%d",__LINE__);
 				XuiButtonStat selStat;
 				XuiButtonStat selPressStat;
 				XuiShowWindow(settle_page_btn(i),XUI_HIDE,0);
@@ -397,8 +390,6 @@ int settle_page_refresh()
 				if(j == 0)
 				{	memset(&selPressStat,0,sizeof(XuiButtonStat));
 					selPressStat.text_fg=create_xui_color(0xff000000);
-				
-					//selPressStat.text_fg=create_xui_color(node_get_btn_text_color(node));
 					XuiButtonSetKey(selTxt,settle_page_btn_virtual_Text_key_base());
 					selPressStat.btn_bg=create_xui_color(node_get_btn_bg_color_p(node));
 					XuiShowWindow(selTxt,XUI_SHOW,0);
@@ -464,15 +455,20 @@ int settle_page_process()
 		if (XuiHasKey()) {
 			key=XuiGetKey(); 
 			set_settle_page_key(key);
-			Pax_Log(LOG_INFO,"set key=%d",key);
+			PaxLog(LOG_INFO,"set key=%d",key);
 			if(key >= settle_page_btn_virtual_key_base() && key < 20000)
 			{
 				glSelectPageBtnFlag = 1; 
-				Pax_Log(LOG_INFO,"set glSelectPageBtnFlag=1");
+				PaxLog(LOG_INFO,"set glSelectPageBtnFlag=1");
 			}
 
 		} else {
-			if (OsTimerCheck(&timer)==0) {return page_code_timeout_eixt();}
+			if (OsTimerCheck(&timer)==0) 
+			{
+				 OsSysSleepEx(1);
+				 OsTimerSet(&timer,book_menu_exit_delay_ms());
+				
+			}
 			continue;
 		}
 		OsTimerSet(&timer,book_menu_exit_delay_ms());
@@ -508,7 +504,7 @@ int settle_page_process()
 		}
 		if(key == settle_page_btn_virtual_Text_key_base())
 		{
-			Pax_Log(LOG_INFO,"key=text");
+			PaxLog(LOG_INFO,"key=text");
 			continue;
 			
 		}
@@ -516,12 +512,12 @@ int settle_page_process()
 		{ 
 		   if(glStartSelProductThread == 1)
 		   { 
-				Pax_Log(LOG_INFO,"wait thread to stop");
+				PaxLog(LOG_INFO,"wait thread to stop");
 				continue;
 			}
 			else
 			{
-				Pax_Log(LOG_INFO,"dont need to wait thread");
+				PaxLog(LOG_INFO,"dont need to wait thread");
 				return key;
 			}
 		}

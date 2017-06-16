@@ -16,11 +16,7 @@ XuiColor create_xui_color(int argb_hex);
 
 #define BOOK_KEYPAD_CONFIG
 int book_keypad_win_width() {return book_menu_win_width();}
-//int book_keypad_win_height() {return book_menu_win_height()*1/10;}
-//int book_keypad_win_height() {return book_menu_win_height()*1/10 + 35;}
 int book_keypad_win_height() {return book_menu_win_height()- book_page_win_height() - book_title_win_height();}
-
-//int book_keypad_win_height() {return book_menu_win_height()*1/8;}
 int book_keypad_win_x() {return 0;}
 int book_keypad_win_y() {return book_title_win_height()+book_page_win_height();}
 int book_keypad_win_color() {return minipos_page_background_color();}

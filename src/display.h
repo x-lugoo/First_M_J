@@ -72,10 +72,10 @@ typedef struct{
 
 //functions
 int GetFormantAmount(double* amount);
-int Init_Display(void);
-void Destroy_Display(void);
-void Display_Prompt(const char *psztitle, const char *pszStr, MSGTYPE eMsgType, int iNeedConfirm);
-void Beep_Prompt(char cFlag);
+int InitDisplay(void);
+void DestroyDisplay(void);
+void DisplayPrompt(const char *psztitle, const char *pszStr, MSGTYPE eMsgType, int iNeedConfirm);
+void BeepPrompt(char cFlag);
 void Display_Error_Code(int iErrCode);
 void HidePromptWin(void);
 

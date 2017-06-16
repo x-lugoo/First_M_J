@@ -13,7 +13,7 @@ long Filesize(const char *pszFilename)
 
 	iRet = stat(pszFilename, &buf);
 	if ( iRet < 0 ) {
-		Pax_Log(LOG_ERROR, "stat return %d, errno=%d,%s, P1=%s", iRet, errno, strerror(errno), pszFilename);
+		PaxLog(LOG_ERROR, "stat return %d, errno=%d,%s, P1=%s", iRet, errno, strerror(errno), pszFilename);
 		return OT_ERR;
 	}
 	return (int)buf.st_size;
@@ -185,7 +185,7 @@ int PaxGenUuid(char *pszPosUnitID, int iPosUnitIDLen, char *pszBeaconUuid)
 	memset(uszPosUnitID, 0, sizeof(uszPosUnitID));
 	iLen = PaxCharsToHex(uszPosUnitID, szTempPosUnitId, iPosUnitIDLen);
 	if ( iLen < 0 ) {
-		Pax_Log(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
+		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
 		return OT_ERR;
 	}
 	memset(uszTemp, 0x00, sizeof(uszTemp));
@@ -195,7 +195,7 @@ int PaxGenUuid(char *pszPosUnitID, int iPosUnitIDLen, char *pszBeaconUuid)
 
 	//debug
 	for (i=0; i < 16; i++) {
-		Pax_Log(LOG_INFO, "%s - %d pszBeaconUuid=%02x", __FUNCTION__, __LINE__, pszBeaconUuid[i]);
+		PaxLog(LOG_INFO, "%s - %d pszBeaconUuid=%02x", __FUNCTION__, __LINE__, pszBeaconUuid[i]);
 	}
 
 	return OT_OK;
@@ -239,7 +239,7 @@ int PaxCharsToHex ( unsigned char *pucBhex, char *pszBasc, unsigned int nc )
 }
 
 static char *sg_pszResPath=NULL;
-void Set_Prefix_Res_Path(const char *pszStr)
+void SetPrefixResPath(const char *pszStr)
 {
     if (pszStr == NULL)
     {
@@ -254,7 +254,7 @@ void Set_Prefix_Res_Path(const char *pszStr)
     memcpy(sg_pszResPath, pszStr, strlen(pszStr));
 }
 //if call this function without setPrefixResPath, it will return incoming string.
-const char *Add_Prefix_Res_Path(const char *pszStr)
+const char *AddPrefixResPath(const char *pszStr)
 {
     int iAddedPathLen=0;
     static char s_szAddedPath[48]={0};

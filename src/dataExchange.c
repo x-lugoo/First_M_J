@@ -10,10 +10,6 @@
 
 #define JSON_FILE  				"./data/json/newjason.dat"
 
-#ifdef JEFF_DEBUG
-	
-#endif
-
 struct miniposToMainapp glMiniPosData;
 struct mainappToMinipos glMainAppData;
 
@@ -29,9 +25,6 @@ int GetDataFromNodeStruc(void)
 {
 	int iProductCount;
 	uchar pszformatAmount[30];
-#ifdef JEFF_DEBUG
-	uchar pszTestAmount[30];
-#endif
 	int i;
 
 	glTotalCount = settle_product_count();
@@ -41,7 +34,7 @@ int GetDataFromNodeStruc(void)
 	glOrderAllProduct.totalPrice = glTotalPrice;
 	glOrderAllProduct.totalVat = glTotalVat;
 	iProductCount = glOrderAllProduct.orderQuantity;
-	Pax_Log(LOG_INFO,"TestiProductCount=%d,iProductTotalCount=%d,iProductTotalAmount=%d",
+	PaxLog(LOG_INFO,"TestiProductCount=%d,iProductTotalCount=%d,iProductTotalAmount=%d",
 			iProductCount,glTotalCount,glTotalPrice);
 	for(i = 0;i < iProductCount;i++)
 	{
@@ -56,11 +49,6 @@ int GetDataFromNodeStruc(void)
 	memset(glMiniPosData.amount,'0',12);
 	FormatFloat(glTotalPrice,pszformatAmount);
 	memcpy(glMiniPosData.amount + 12 - strlen(pszformatAmount),pszformatAmount,strlen(pszformatAmount));
-#ifdef JEFF_DEBUG
-	memset(pszTestAmount,0,sizeof(pszTestAmount)); 
-	memcpy(pszTestAmount,glMiniPosData.amount,12); 
-	Pax_Log(LOG_INFO,"pszTestAmount=%s",pszTestAmount);
-#endif
 	return 0;
 }
 
@@ -75,7 +63,6 @@ int menu_exec(MENU_SELECTION menuStat){
 	{	
 	switch(stat) {	
 	case stat_main_menu:
-		//Pax_Log(LOG_INFO, "start to entry menu page:_ %s - %d", __FUNCTION__, __LINE__);
 		book_menu_process();			
 		int ret_mp=smenu_get_ret_value();		
 		if (ret_mp==page_code_exit())
@@ -93,7 +80,6 @@ int menu_exec(MENU_SELECTION menuStat){
 		}
 			break;			
 	case stat_settle_menu:
-		//Pax_Log(LOG_INFO, "start to entry settle page:%s - %d",__FUNCTION__, __LINE__);
 		settle_menu_process();			
 		int ret_smp=settle_menu_process_get_value();	
 		if (ret_smp==page_code_exit())
@@ -107,40 +93,8 @@ int menu_exec(MENU_SELECTION menuStat){
 		if (ret_smp==page_code_ensure()) 
 		{			
 			stat=stat_exit;
-			//stat = stat_payment_menu;
 		}			
 			break;	
-#if 0   //remain it as a show of demo.
-	case stat_payment_menu:
-		iPayKeyRet = payment_menu_process();
-		XuiShowWindow(payment_menu_win(),XUI_HIDE,0);
-		if(iPayKeyRet == page_code_back())
-		{
-			stat = stat_settle_menu;
-		}
-	    else if(iPayKeyRet == XUI_KEY1 || iPayKeyRet == XUI_KEY2 ||
-	      iPayKeyRet == XUI_KEY3)
-	     {
-			stat=stat_exit;
-	      
-	      }
-
-	    else if(iPayKeyRet = page_code_timeout_eixt())
-	    {
-	    	stat=stat_exit;
-	    }
-		#if 0
-		while(0) //fetch and check json data from file
-		{
-			if (XuiHasKey() && XuiGetKey() == XUI_KEY9)
-			{
-				break;
-			}
-		}
-		
-		#endif
-			break;
-#endif
 	case stat_exit:	
 		default:		
 			break;	
@@ -158,20 +112,20 @@ int HandleReversal(void)
 
 	if(access(FILE_REVERSALFlAG,F_OK) < 0)
 	{
-		Pax_Log(LOG_DEBUG,"%s,Line:%d",__FUNCTION__,__LINE__);  //if reversal file is not exist,return 0;
+		PaxLog(LOG_DEBUG,"%s,Line:%d",__FUNCTION__,__LINE__);  //if reversal file is not exist,return 0;
 		glReverFlag = '0';
 		return 0;
 	}
 	iRet = ReadFile(FILE_REVERSALFlAG,&glReverFlag,1);
-	Pax_Log(LOG_DEBUG,"iRet=%d,glReverFlag=%c,%s,Line:%d",iRet,glReverFlag,__FUNCTION__,__LINE__);
+	PaxLog(LOG_DEBUG,"iRet=%d,glReverFlag=%c,%s,Line:%d",iRet,glReverFlag,__FUNCTION__,__LINE__);
 	if(iRet)
 	{
 		return iRet;
 	}
 	if(glReverFlag == '1')
 	{
-		Pax_Log(LOG_DEBUG,"start to process reversal%s,Line:%d",__FUNCTION__,__LINE__);  //if re
-		iRet = Request_Process(CMD_UPLOAD_DATA,NORMAL);
+		PaxLog(LOG_DEBUG,"start to process reversal%s,Line:%d",__FUNCTION__,__LINE__);  //if re
+		iRet = RequestProcess(CMD_UPLOAD_DATA,NORMAL);
 		if(iRet)
 		{
 			return iRet;
@@ -183,7 +137,7 @@ int HandleReversal(void)
 
 int SaveMainAppDataForTest(void)  //for test com with MAINAPP
 {
-#if 1
+#ifdef JEFF_DEBUG
 	int iFd;
 	int i;
 	int iLen;
@@ -199,7 +153,6 @@ int SaveMainAppDataForTest(void)  //for test com with MAINAPP
 	MainAppData.wakeUpReason = MAIN_WAKEUP_STARTUP;
 	MainAppData.paymentType = '4';
 	strcpy(MainAppData.currency,"DKK");
-	//MainAppData.wakeupReason = MAIN_WAKEUP_PAYRESULT;
 	pIn = (unsigned char *)&MainAppData;
 	crc32Init(&ulCRC32);
 	for(i = 0;i < uiLen;i++)
@@ -215,13 +168,13 @@ int SaveMainAppDataForTest(void)  //for test com with MAINAPP
 	iFd = open(FILE_MAINAPP_MINIPOS, O_CREAT | O_WRONLY, S_IRWXU|S_IRWXG|S_IRWXO);
 	if(iFd < 0)
 	{
-		Pax_Log(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
+		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
 		return FILE_ERR_OPEN_FAIL;
 	}
 	iLen = write(iFd,&MainAppData,uiLen);
 	if(iLen != uiLen)
 	{
-		Pax_Log(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
+		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
 		close(iFd);
 		return FILE_ERR_INVLIDE_DATA;
 	}
@@ -232,9 +185,8 @@ int SaveMainAppDataForTest(void)  //for test com with MAINAPP
 		return M2M_WRITE_ERROR;
 	}
 	close(iFd);
+#endif	
 	return M2M_SUCCESS;
-#endif
-
 
 }
 
@@ -360,13 +312,11 @@ int LoadMainDataForMini(struct mainappToMinipos *pRequest)
 		return M2M_INVALID_CRC;
 	}
     glCurrencyName = pRequest->currency;
-  #ifdef JEFF_DEBUG
-  Pax_Log(LOG_DEBUG,"currency=%s,payResult=%c,waiterId=%s,wakeup=%c,orderid=%s,terminalId=%s",
+#ifdef JEFF_DEBUG
+  PaxLog(LOG_DEBUG,"currency=%s,payResult=%c,waiterId=%s,wakeup=%c,orderid=%s,terminalId=%s",
   pRequest->currency,pRequest->paymentResult, pRequest->waiterID,pRequest->wakeUpReason,
   pRequest->orderID,pRequest->terminalID);
-  
- 
-  #endif
+#endif
 	return M2M_SUCCESS;
 }
 
@@ -379,7 +329,7 @@ int LoadReverdata(char *pszJsonData)
 
 	if(access(FILE_REVERSAL, F_OK) < 0) 
 	{
-		Pax_Log(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
+		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
 		return FILE_ERR_NOT_EXIST;
 	}
 
@@ -387,13 +337,13 @@ int LoadReverdata(char *pszJsonData)
 
 	iFd = open(FILE_REVERSAL,O_RDONLY);
 	if (iFd < 0) {
-		Pax_Log(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
+		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
 		return FILE_ERR_OPEN_FAIL;
 	}
 	iLen = read(iFd,pszJsonData,iFileLen);
 	if(iLen != iFileLen)
 	{
-		Pax_Log(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
+		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
 		close(iFd);
 		return FILE_ERR_INVLIDE_DATA;
 	}
@@ -411,7 +361,7 @@ int ReadJason(unsigned char *pszStr)
 
 	if(access(JSON_FILE,F_OK) < 0)
 	{
-		Pax_Log(LOG_ERROR,"%s,Line:%d",__FUNCTION__,__LINE__);
+		PaxLog(LOG_ERROR,"%s,Line:%d",__FUNCTION__,__LINE__);
 		return FILE_ERR_NOT_EXIST;
 	}
 
@@ -420,12 +370,12 @@ int ReadJason(unsigned char *pszStr)
    iFd = open(JSON_FILE, O_RDONLY);
    if(iFd < 0)
    {
-	   Pax_Log(LOG_ERROR,"%s,Line:%d",__FUNCTION__,__LINE__);
+	   PaxLog(LOG_ERROR,"%s,Line:%d",__FUNCTION__,__LINE__);
 	   return FILE_ERR_OPEN_FAIL;
    }
 
     iFileTemLen = read(iFd,pszStr,iFileLen);
-    Pax_Log(LOG_ERROR,"iFileTemLen=%d  %s,Line:%d",iFileTemLen,__FUNCTION__,__LINE__);
+    PaxLog(LOG_ERROR,"iFileTemLen=%d  %s,Line:%d",iFileTemLen,__FUNCTION__,__LINE__);
 	if(iFileTemLen != iFileLen)
 	{
 	   close(iFd);
@@ -448,7 +398,7 @@ int SaveUpdateJsonData(char *pszJasonData,int iUpdateJasonFlag)
 	iFd = open(JSON_FILE, O_CREAT | O_RDWR, S_IRWXU|S_IRWXG|S_IRWXO);
 	if ( iFd < 0 )
 	{
-		Pax_Log(LOG_ERROR, "save file fail,iFd=%d %s - %d",iFd, __FUNCTION__, __LINE__);
+		PaxLog(LOG_ERROR, "save file fail,iFd=%d %s - %d",iFd, __FUNCTION__, __LINE__);
 		return FILE_ERR_OPEN_FAIL;
 	}
 	
@@ -468,11 +418,11 @@ int SaveFile(const char *pszFileName,const void *psData,int iDataLen)
 	int iFd;
 	int iLen;
 
-	Pax_Log(LOG_DEBUG, "saving file:%s,%s - %d",pszFileName, __FUNCTION__, __LINE__);
+	PaxLog(LOG_DEBUG, "saving file:%s,%s - %d",pszFileName, __FUNCTION__, __LINE__);
 	iFd = open(pszFileName, O_CREAT | O_RDWR, S_IRWXU|S_IRWXG|S_IRWXO);
 	if ( iFd < 0 )
 	{
-		Pax_Log(LOG_ERROR, "save file fail,iFd=%d %s - %d",iFd, __FUNCTION__, __LINE__);
+		PaxLog(LOG_ERROR, "save file fail,iFd=%d %s - %d",iFd, __FUNCTION__, __LINE__);
 		return FILE_ERR_OPEN_FAIL;
 	}
 
@@ -490,11 +440,11 @@ int ReadFile(const char *pszFileName,const void *psData,int iDataLen)
 	int iFd;
 	int iLen;
 
-	Pax_Log(LOG_DEBUG, "reading file:%s,%s - %d",pszFileName, __FUNCTION__, __LINE__);
+	PaxLog(LOG_DEBUG, "reading file:%s,%s - %d",pszFileName, __FUNCTION__, __LINE__);
 	iFd = open(pszFileName,O_RDWR);
 	if ( iFd < 0 )
 	{
-		Pax_Log(LOG_ERROR, "save file:%s_fail,iFd=%d %s - %d",pszFileName,iFd, __FUNCTION__, __LINE__);
+		PaxLog(LOG_ERROR, "save file:%s_fail,iFd=%d %s - %d",pszFileName,iFd, __FUNCTION__, __LINE__);
 		return FILE_ERR_OPEN_FAIL;
 	}
 	iLen = read(iFd,psData,iDataLen);
@@ -510,12 +460,13 @@ int LoadTerminalProduct(void)
 {
 	int iRet;
 
-	Display_Prompt("UPDATING TERMINAL", "Please wait while we update your terminal.", MSGTYPE_UPLOADING, 0);
-	iRet = Request_Process(CMD_GET_TXNINFO,SAVE_JSON);
+	DisplayPrompt("PLEASE WAIT", "Processing request...", MSGTYPE_UPLOADING, 0);
+	PaxLog(LOG_INFO,"--------------updating terminal,fun:%s,line:%d",__FUNCTION__,__LINE__);
+	iRet = RequestProcess(CMD_GET_TXNINFO,UPDATE_JSON);
 	HidePromptWin();
 	if(iRet)
 	{	
-		Pax_Log(LOG_DEBUG,"Request_Process,iRet=%d,fun:%s_line:%d",
+		PaxLog(LOG_DEBUG,"RequestProcess,iRet=%d,fun:%s_line:%d",
 							iRet,__FUNCTION__,__LINE__);
 		return iRet;
 	}
@@ -526,12 +477,12 @@ int UpdateTerminalProduct(void)
 {
 	int iRet;
 
-	Display_Prompt("UPDATING TERMINAL", "Please wait while we update your terminal.", MSGTYPE_UPLOADING, 0);
-	iRet = Request_Process(CMD_GET_TXNINFO,UPDATE_JSON);
+	DisplayPrompt("PLEASE WAIT", "Processing request...", MSGTYPE_UPLOADING, 0);
+	iRet = RequestProcess(CMD_GET_TXNINFO,UPDATE_JSON);
 	HidePromptWin();
 	if(iRet)
 	{	
-		Pax_Log(LOG_DEBUG,"Request_Process,iRet=%d,fun:%s_line:%d",
+		PaxLog(LOG_DEBUG,"RequestProcess,iRet=%d,fun:%s_line:%d",
 							iRet,__FUNCTION__,__LINE__);
 		return iRet;
 	}
@@ -546,7 +497,7 @@ static int SaveProductDataMiniposData()
 	iRet = SaveFile(ORDER_AllPRODUCT_FILE,&glOrderAllProduct,sizeof(struct _orderAllProduct));
 	if(iRet)
 	{	
-		Pax_Log(LOG_DEBUG,"save all product_file,iRet=%d,fun:%s_line:%d",
+		PaxLog(LOG_DEBUG,"save all product_file,iRet=%d,fun:%s_line:%d",
 							iRet,__FUNCTION__,__LINE__);
 		return iRet;
 	}
@@ -554,7 +505,7 @@ static int SaveProductDataMiniposData()
     iRet = SaveMiniDataForMain(&glMiniPosData);
     if(iRet)
 	{	
-		Pax_Log(LOG_DEBUG,"Save_MiniData_ForMain,iRet=%d,fun:%s_line:%d",
+		PaxLog(LOG_DEBUG,"Save_MiniData_ForMain,iRet=%d,fun:%s_line:%d",
 							iRet,__FUNCTION__,__LINE__);
 		return iRet;
 	}
@@ -568,34 +519,24 @@ int ProcessStartUp(void)
 	iRet = menu_exec(stat_main_menu);
 	if(iRet)
 	{	
-		Pax_Log(LOG_DEBUG,"menu_exec,iRet=%d,fun:%s_line:%d",
+		PaxLog(LOG_DEBUG,"menu_exec,iRet=%d,fun:%s_line:%d",
 							iRet,__FUNCTION__,__LINE__);
 		return iRet;
 	}
 	iRet = GetDataFromNodeStruc();
 	if(iRet)
 	{	
-		Pax_Log(LOG_DEBUG,"GetDataFromNodeStruc,iRet=%d,fun:%s_line:%d",
+		PaxLog(LOG_DEBUG,"GetDataFromNodeStruc,iRet=%d,fun:%s_line:%d",
 							iRet,__FUNCTION__,__LINE__);
 		return iRet;
 	}
 	iRet = SaveProductDataMiniposData();
 	if(iRet)
 	{	
-		Pax_Log(LOG_DEBUG,"SaveProductData_MiniposData,iRet=%d,fun:%s_line:%d",
+		PaxLog(LOG_DEBUG,"SaveProductData_MiniposData,iRet=%d,fun:%s_line:%d",
 							iRet,__FUNCTION__,__LINE__);
 		return iRet;
 	}
-#if 0  // close printing be conveniented for test
-				iRet = PrintReceipt(glOrderAllProduct.orderLine,glOrderAllProduct.orderQuantity);
-				if(iRet)
-				{	
-					Pax_Log(LOG_DEBUG,"PrintReceipt,iRet=%d,fun:%s_line:%d",
-										iRet,__FUNCTION__,__LINE__);
-					return iRet;
-				}
-#endif
-
 	return 0;
 }
 
@@ -614,38 +555,40 @@ int ProcessPaymentResult(PAYMENT_RESULT paymentResult)
     switch(paymentResult)
     {
     	case MAIN_PAYRESULT_APPROVED:
-			Pax_Log(LOG_INFO,"start to handleReversal 	fun:%s,line:%d",__FUNCTION__,__LINE__);
+			PaxLog(LOG_INFO,"start to handleReversal 	fun:%s,line:%d",__FUNCTION__,__LINE__);
 			iRet = HandleReversal();
 			if(iRet)
 			{
-				Display_Prompt("FAIL", "Upload Order Product Fail" ,MSGTYPE_FAILURE, 0);
+				DisplayPrompt("FAIL", "Upload Order Product Fail" ,MSGTYPE_FAILURE, 0);
 				HidePromptWin();
-				Destroy_Display();
+				DestroyDisplay();
 				break;
 			}
-			Pax_Log(LOG_INFO, "%s - %d HandleReversal", __FUNCTION__, __LINE__);
-			iRet = Request_Process(CMD_UPLOAD_DATA,NORMAL);
+			PaxLog(LOG_INFO, "%s - %d HandleReversal", __FUNCTION__, __LINE__);
+			iRet = RequestProcess(CMD_UPLOAD_DATA,NORMAL);
 			if(iRet)
 			{
-				Pax_Log(LOG_INFO, "Request_Process iRet=%d %s - %d ",iRet, __FUNCTION__, __LINE__);
-				Display_Prompt("FAIL", "Upload Order Product Fail" ,MSGTYPE_FAILURE, 0);
+				PaxLog(LOG_INFO, "RequestProcess iRet=%d %s - %d ",iRet, __FUNCTION__, __LINE__);
+				DisplayPrompt("FAIL", "Upload Order Product Fail" ,MSGTYPE_FAILURE, 0);
 				HidePromptWin();
-				Destroy_Display();
+				DestroyDisplay();
 				break;
 				
 			}
-#if 1  // close printing be conveniented for test
 			iRet = PrintReceipt(glOrderAllProduct.orderLine,glOrderAllProduct.orderQuantity);
 			if(iRet)
 			{	
-				Pax_Log(LOG_DEBUG,"PrintReceipt,iRet=%d,fun:%s_line:%d",
+				PaxLog(LOG_DEBUG,"PrintReceipt,iRet=%d,fun:%s_line:%d",
 									iRet,__FUNCTION__,__LINE__);
 				return iRet;
 			}
-#endif
+			iRet = ProcessStartUp();
+			if(iRet)
+			{
+				return iRet;
+			}
 			break;
-		case MAIN_PAYRESULT_CANCELLED:
-		case MAIN_PAYRESULT_DENIED:
+		 default:
 			for(i = 0;i < glOrderAllProduct.orderQuantity;i++)
 			{
 				for(j = 0;j < product_list_node_count();j++)
@@ -659,24 +602,28 @@ int ProcessPaymentResult(PAYMENT_RESULT paymentResult)
 					}
 				}
 			}
-			menu_exec(stat_settle_menu);
+			iRet = menu_exec(stat_settle_menu);
+			if(iRet)
+			{	
+				PaxLog(LOG_DEBUG,"menu_exec,iRet=%d,fun:%s_line:%d",
+							iRet,__FUNCTION__,__LINE__);
+				return iRet;
+			}
 			iRet = GetDataFromNodeStruc();
 			if(iRet)
 			{	
-				Pax_Log(LOG_DEBUG,"GetDataFromNodeStruc,iRet=%d,fun:%s_line:%d",
+				PaxLog(LOG_DEBUG,"GetDataFromNodeStruc,iRet=%d,fun:%s_line:%d",
 									iRet,__FUNCTION__,__LINE__);
 				break;
 			}
 			iRet = SaveProductDataMiniposData();
 			if(iRet)
 			{	
-				Pax_Log(LOG_DEBUG,"SaveProductData_MiniposData,iRet=%d,fun:%s_line:%d",
+				PaxLog(LOG_DEBUG,"SaveProductData_MiniposData,iRet=%d,fun:%s_line:%d",
 									iRet,__FUNCTION__,__LINE__);
 				break;
 			}
 				break;
-		default:
-			break;
 	}
 	return iRet;
 }

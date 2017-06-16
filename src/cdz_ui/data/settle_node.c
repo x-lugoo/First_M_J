@@ -21,10 +21,10 @@ NODE_T *product_list_node(int i)
 		int count=family_tree_get_count();
 		for (i=0;i!=count;++i) {
 			NODE_T *node=family_tree_get_node(i);
-			//Pax_Log(LOG_INFO,"product[name:%s]  func:%s,line:%d",node_get_name(node),__FUNCTION__,__LINE__);
+			//PaxLog(LOG_INFO,"product[name:%s]  func:%s,line:%d",node_get_name(node),__FUNCTION__,__LINE__);
 			if (node_is_product(node)) {
 				s_list[s_product_list_node_count++]=node;
-				//Pax_Log(LOG_INFO,"product[name:%s][variable_price:%d],func:%s,line:%d",node_get_name(node),product_node_get_variable_price(node),__FUNCTION__,__LINE__);
+				//PaxLog(LOG_INFO,"product[name:%s][variable_price:%d],func:%s,line:%d",node_get_name(node),product_node_get_variable_price(node),__FUNCTION__,__LINE__);
 			}
 		}
 		first=0;

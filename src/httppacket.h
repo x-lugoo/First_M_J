@@ -25,11 +25,11 @@ typedef enum _paymentCmd {
 
 
 
-int Result_Process(long lRetcode, char *szRetJsonData,REQUESTCMD ePackCmd,int iUpdateJsonFlag);
-int Get_Request_Json(char *pszJsonData, int iBufSize,REQUESTCMD ePackCmd);
-int Get_Time_Stamp_UTC_String(char *pszTimeStamp, int iBufSize);
-int Calculate_HMAC(const unsigned char *pucContent, int iContentLen,
+int ResultProcess(long lRetcode, char *szRetJsonData,REQUESTCMD ePackCmd,int iUpdateJsonFlag);
+int GetRequestJson(char *pszJsonData, int iBufSize,REQUESTCMD ePackCmd);
+int GetTimeStampUTCString(char *pszTimeStamp, int iBufSize);
+int CalculateHMAC(const unsigned char *pucContent, int iContentLen,
 		const unsigned char *pucapiKey, int iApiKeyLen, char *pszEncodeData, int iBufSize);
-int Base64_Encode(const char *szStr, int iStrLen, char *pszEncode, int iEncodeLen);
-int Request_Process(REQUESTCMD ePackCmd,int iUpdateJsonFlag);
+int Base64Encode(const char *szStr, int iStrLen, char *pszEncode, int iEncodeLen);
+int RequestProcess(REQUESTCMD ePackCmd,int iUpdateJsonFlag);
 #endif

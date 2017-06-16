@@ -28,7 +28,7 @@ int PackOrderApiJson(char *pszOutJsonData)
 	int i;
 	int iRet;
 
-    Pax_Log(LOG_INFO,"start to pack order api Jason,MAX_ORDER_PRODUCT =%d",MAX_ORDER_PRODUCT);
+    PaxLog(LOG_INFO,"start to pack order api Jason,MAX_ORDER_PRODUCT =%d",MAX_ORDER_PRODUCT);
 	iRet = ReadFile(ORDER_AllPRODUCT_FILE,&glOrderAllProduct,sizeof(struct _orderAllProduct));
 	if(iRet)
 	{
@@ -49,7 +49,14 @@ int PackOrderApiJson(char *pszOutJsonData)
 		pObjectOrderLine = json_object();
 		json_object_set_new(pObjectOrderLine,"quantity",json_integer(glOrderAllProduct.orderLine[i].quantity));
 		json_object_set_new(pObjectOrderLine,"price",json_integer((int)glOrderAllProduct.orderLine[i].price));
-		json_object_set_new(pObjectOrderLine,"vat",json_real(glOrderAllProduct.orderLine[i].vat));
+		//if(glOrderAllProduct.orderLine[i].product_id == 20)
+		//{
+			//json_object_set_new(pObjectOrderLine,"vat",json_integer(0));
+		//}
+		//else
+		//{
+			json_object_set_new(pObjectOrderLine,"vat",json_real(glOrderAllProduct.orderLine[i].vat));
+		//}
 		json_object_set_new(pObjectOrderLine,"product_id",json_integer(glOrderAllProduct.orderLine[i].product_id));
 		json_array_insert(pArray,i,pObjectOrderLine);
 	}
@@ -72,8 +79,8 @@ int HandleReturnOrderJson(char *pszInJsonData)
 	json_error_t error;
 	const char *key;
 
-	Pax_Log(LOG_INFO,"start to print Ret json log");
-	Pax_Log(LOG_INFO,"pszInJsonData=%s					fun:%s,Line:%d",
+	PaxLog(LOG_INFO,"start to print Ret json log");
+	PaxLog(LOG_INFO,"pszInJsonData=%s					fun:%s,Line:%d",
 			pszInJsonData,__FUNCTION__,__LINE__);
 	jsRoot = json_loads(pszInJsonData,0,&error);
 	if(jsRoot == NULL)
@@ -85,22 +92,22 @@ int HandleReturnOrderJson(char *pszInJsonData)
 	{
 		json_object_foreach(jsRoot, key, value)
 		{
-			Pax_Log(LOG_INFO,"key=%s",key);
+			PaxLog(LOG_INFO,"key=%s",key);
 			if(JSON_TRUE == json_typeof(value))
 			{
 				json_decref(jsRoot);
-				Pax_Log(LOG_INFO,"value = true");
+				PaxLog(LOG_INFO,"value = true");
 				return UpdateTerminalProduct();
 			}
 			else if (JSON_FALSE == json_typeof(value))
 			{
 				json_decref(jsRoot);
-				Pax_Log(LOG_INFO,"value = false");
+				PaxLog(LOG_INFO,"value = false");
 			}
 			else
 			{
 				json_decref(jsRoot);
-			    Pax_Log(LOG_INFO,"error formant");
+			    PaxLog(LOG_INFO,"error formant");
 			    return JSON_FORMAT_ERROR;
 			}
 		}
@@ -108,7 +115,7 @@ int HandleReturnOrderJson(char *pszInJsonData)
 	else
 	{
 		json_decref(jsRoot);
-		Pax_Log(LOG_INFO,"error formant");
+		PaxLog(LOG_INFO,"error formant");
 		return JSON_FORMAT_ERROR;
 	}
 	return 0;

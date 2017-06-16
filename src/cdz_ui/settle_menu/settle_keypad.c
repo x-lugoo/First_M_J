@@ -13,12 +13,9 @@ XuiColor create_xui_color(int argb_hex);
 #define KEYPAD_WINDOW_CONFIG
 int settle_keypad_win_color() {return minipos_page_background_color();}
 int settle_keypad_win_width() {return book_menu_win_width();}
-//int settle_keypad_win_height() {return book_menu_win_height()*1/9;}
 int settle_keypad_win_height() {return book_menu_win_height()*1/10 + 25;}
 
 int settle_keypad_win_x() {return 0;}
-//int settle_keypad_win_y() {return book_title_win_height()+settle_page_win_height();}
-
 int settle_keypad_win_y() {return book_title_win_height()+book_page_win_height();}
 
 int settle_keypad_btn_count_x_max() {return 4;}
@@ -52,7 +49,6 @@ XuiWindow *settle_keypad_win()
 		settle_keypad_btn_back_refresh();
 		settle_keypad_btn_ensure_refresh();
 		settle_keypad_btn_delete_refresh();
-		//settle_keypad_btn_add_refresh();
 		first=0;
 	}
 	return settle_keypad_win_addr();
@@ -65,9 +61,7 @@ int settle_keypad_refresh()
 	settle_keypad_btn_ensure_refresh();
 	if (settle_page_process_get_select_node()!=NULL) {
 		XuiShowWindow(settle_keypad_btn_index(settle_keypad_btn_delete_btn_list_index()),XUI_SHOW,0);
-		//XuiShowWindow(settle_keypad_btn_index(settle_keypad_btn_add_btn_list_index()),XUI_SHOW,0);
 	} else {
-		//XuiShowWindow(settle_keypad_btn_index(settle_keypad_btn_add_btn_list_index()),XUI_HIDE,0);
 		XuiShowWindow(settle_keypad_btn_index(settle_keypad_btn_delete_btn_list_index()),XUI_HIDE,0);
 	}
 	return 0;	

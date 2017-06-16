@@ -66,7 +66,7 @@ char *title_product_amount_text()
 	static char s_str[32]={0};
 	memset(s_str,0,sizeof(s_str));
 	sprintf(s_str,"TOTAL: %s %s",amount_to_format_str(settle_product_amount()),glCurrencyName);
-	ERR("------------------------------amount=%s,%d",s_str,settle_product_amount());
+	//ERR("------------------------------amount=%s,%d",s_str,settle_product_amount());
 	return s_str;
 }
 int title_product_amount_text_color() {return book_title_win_text_color();}
@@ -124,11 +124,6 @@ int settle_title_refresh()
 	{
 		XuiCanvasDrawText(settle_title_win(),title_product_count_text_x(),title_product_count_text_y(),title_product_count_text_height(),
 			title_product_text_font(),0,create_xui_color(title_product_count_text_color()),title_product_count_text());
-	}
-
-	{//draw product_count_square
-		//XuiCanvasDrawRect(settle_title_win(),settle_title_square_x(),settle_title_square_y(),settle_title_square_width(),settle_title_square_height(),
-			//create_xui_color(settle_title_square_color()),0,0);
 	}
 	
 	{//draw product_count_square

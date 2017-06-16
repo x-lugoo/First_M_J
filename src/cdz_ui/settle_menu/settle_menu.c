@@ -69,7 +69,7 @@ static int s_settle_menu_ret_value=0;
 
 int WaitSelProThread(int pthread) //added by jeff_xiehuan20170528
 {
-     Pax_Log(LOG_INFO,"start to join pthread d=%d",pthread);
+     PaxLog(LOG_INFO,"start to join pthread d=%d",pthread);
      pthread_join(pthread,NULL);
      if(glStartSelProductThread == 1)
      {
@@ -87,7 +87,7 @@ int settle_menu_process()
 	WaitSelProThread(selProductThread);
 	while (1) {
 		int page_code=settle_page_process();//ERR("settle_page_process=%d",page_code);
-		Pax_Log(LOG_INFO,"settle_page_process,=%d",page_code);
+		PaxLog(LOG_INFO,"settle_page_process,=%d",page_code);
 		if (page_code==page_code_to_prev_page()) {
 			pthread_create(&selProductThread, NULL, SettleProductSel, NULL);
 			WaitSelProThread(selProductThread);
@@ -113,10 +113,10 @@ int settle_menu_process()
 		}
 		if(page_code >= 100000)
 		{
-			Pax_Log(LOG_INFO,"page_code>100000,=%d",page_code);
+			PaxLog(LOG_INFO,"page_code>100000,=%d",page_code);
 		}
 		if (page_code == page_code_delete() || page_code >= settle_page_btn_virtual_Sub_key_base()) {
-			Pax_Log(LOG_INFO,"start to delete");
+			PaxLog(LOG_INFO,"start to delete");
 			void *node=settle_page_process_get_select_node();
 			int node_count=product_node_get_count(node)-1;
 			if(page_code == page_code_delete())
@@ -139,7 +139,7 @@ int settle_menu_process()
 		}
 		else if(page_code == key_code_add() || (page_code >= settle_page_btn_virtual_Plus_key_base() && page_code < settle_page_btn_virtual_Sub_key_base())) //add by jeff_xiehuan
 		{
-			Pax_Log(LOG_INFO,"start add");
+			PaxLog(LOG_INFO,"start add");
 			void *node=settle_page_process_get_select_node();
 			int node_count=product_node_get_count(node) + 1;
 			product_node_set_count(node,node_count);

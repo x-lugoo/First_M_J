@@ -99,6 +99,7 @@ enum
 {
 	MINI_WAKEUP_STARTPAY = '1',
 	MINI_WAKEUP_SHOWMENU = '3',
+	MINI_WAKEUP_DONOTHING = 0,
 };
 
 
@@ -113,6 +114,8 @@ struct mainappToMinipos
 	char terminalID[8+1];	// mandatory terminal ID
 	char orderID[64+1];		// mandatory order ID
 	char waiterID[32+1];	// optional waiter ID
+	char ticketLine1[24+1]; // optional ticket line 1
+ 	char ticketLine2[24+1]; // optional ticket line 2
 };
 
 /****************************************************

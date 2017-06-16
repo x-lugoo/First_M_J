@@ -73,7 +73,7 @@ void print_json_aux(json_t *element, int indent) {
         break;
     default:
         //fprintf(stderr, "unrecognized JSON type %d\n", json_typeof(element));
-        Pax_Log(LOG_INFO,"unrecognized JSON type %d\n", json_typeof(element));
+        PaxLog(LOG_INFO,"unrecognized JSON type %d\n", json_typeof(element));
     }
 }
 
@@ -82,9 +82,9 @@ void print_json_indent(int indent) {
    /* for (i = 0; i < indent; i++)
     {
     	//putchar(' ');
-    	Pax_Log(LOG_INFO," ");
+    	PaxLog(LOG_INFO," ");
     }*/
-    //Pax_Log(LOG_INFO,"space id = %d",indent);
+    //PaxLog(LOG_INFO,"space id = %d",indent);
 }
 
 const char *json_plural(int count) {
@@ -99,11 +99,11 @@ void print_json_object(json_t *element, int indent) {
     print_json_indent(indent);
     size = json_object_size(element);
 
-    Pax_Log(LOG_INFO,"JSON Object of %ld pair%s:\n", size, json_plural(size));
+    PaxLog(LOG_INFO,"JSON Object of %ld pair%s:\n", size, json_plural(size));
     json_object_foreach(element, key, value) {
         print_json_indent(indent + 2);
        // printf("JSON Key: \"%s\"\n", key);
-        Pax_Log(LOG_INFO,"JSON Key: \"%s\"\n", key);
+        PaxLog(LOG_INFO,"JSON Key: \"%s\"\n", key);
         print_json_aux(value, indent + 2);
     }
 
@@ -115,7 +115,7 @@ void print_json_array(json_t *element, int indent) {
     print_json_indent(indent);
 
     //printf("JSON Array of %ld element%s:\n", size, json_plural(size));
-    Pax_Log(LOG_INFO,"JSON Array of %ld element%s:\n", size, json_plural(size));
+    PaxLog(LOG_INFO,"JSON Array of %ld element%s:\n", size, json_plural(size));
     for (i = 0; i < size; i++) {
         print_json_aux(json_array_get(element, i), indent + 2);
     }
@@ -124,26 +124,26 @@ void print_json_array(json_t *element, int indent) {
 void print_json_string(json_t *element, int indent) {
     print_json_indent(indent);
     //printf("JSON String: \"%s\"\n", json_string_value(element));
-    Pax_Log(LOG_INFO,"JSON String: \"%s\"\n", json_string_value(element));
+    PaxLog(LOG_INFO,"JSON String: \"%s\"\n", json_string_value(element));
 }
 
 void print_json_integer(json_t *element, int indent) {
     print_json_indent(indent);
    // printf("JSON Integer: \"%" JSON_INTEGER_FORMAT "\"\n", json_integer_value(element));
-    Pax_Log(LOG_INFO,"JSON Integer: \"%d\"\n", json_integer_value(element));
+    PaxLog(LOG_INFO,"JSON Integer: \"%d\"\n", json_integer_value(element));
 }
 
 void print_json_real(json_t *element, int indent) {
     print_json_indent(indent);
     //printf("JSON Real: %f\n", json_real_value(element));
-    Pax_Log(LOG_INFO,"JSON Real: %f\n", json_real_value(element));
+    PaxLog(LOG_INFO,"JSON Real: %f\n", json_real_value(element));
 }
 
 void print_json_true(json_t *element, int indent) {
     (void)element;
     print_json_indent(indent);
     //printf("JSON True\n");
-    Pax_Log(LOG_INFO,"JSON True\n");
+    PaxLog(LOG_INFO,"JSON True\n");
 
 }
 
@@ -151,13 +151,13 @@ void print_json_false(json_t *element, int indent) {
     (void)element;
     print_json_indent(indent);
    // printf("JSON False\n");
-    Pax_Log(LOG_INFO,"JSON False\n");
+    PaxLog(LOG_INFO,"JSON False\n");
 }
 
 void print_json_null(json_t *element, int indent) {
     (void)element;
     print_json_indent(indent);
-    Pax_Log(LOG_INFO,"JSON Null\n");
+    PaxLog(LOG_INFO,"JSON Null\n");
 }
 
 /*
@@ -174,7 +174,7 @@ json_t *load_json(const char *text) {
         return root;
     } else {
         //fprintf(stderr, "json error on line %d: %s\n", error.line, error.text);
-        Pax_Log(LOG_INFO,"json error on line %d: %s\n", error.line, error.text);
+        PaxLog(LOG_INFO,"json error on line %d: %s\n", error.line, error.text);
         return (json_t *)0;
     }
 }
@@ -198,7 +198,7 @@ int testSimpleParse(unsigned char *pszStr) {
 	root = load_json(pszStr);
 	if(root == NULL)
 	{
-		Pax_Log(LOG_ERROR,"%s:Line:%d",__FUNCTION__,__LINE__);
+		PaxLog(LOG_ERROR,"%s:Line:%d",__FUNCTION__,__LINE__);
 		return -1;
 	}
 	if (root) {

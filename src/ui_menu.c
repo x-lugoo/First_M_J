@@ -84,7 +84,7 @@ XuiWindow *GenButton(int x,int y,int color,char *text)
 		statNormal.text_height = 12;
 		statNormal.text_x = XUI_CENTER_X(0, 64, XuiTextWidth(statNormal.text_font, statNormal.text_height, text));
 		statNormal.text_y = 30;
-		//Pax_Log(LOG_INFO,"(statNormal.text_x)=%d,y=%d",statNormal.text_x,statNormal.text_y);
+		//PaxLog(LOG_INFO,"(statNormal.text_x)=%d,y=%d",statNormal.text_x,statNormal.text_y);
 		colorBtnBg.a = 0xa0;
 		statNormal.text = text;
 		XuiButtonSetStat(btnCapture, XUI_BTN_NORMAL, &statNormal);

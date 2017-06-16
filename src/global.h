@@ -36,16 +36,12 @@
 
 
 #define APIKEY_SIZE     128
-
 #define JEFF_DEBUG   //for debug
-
 #define DEBUG_LOG_OPEN   //control log messages output
-//#define DEBUG_LOG_WRITE_FILE
-
 #define USER_CANCEL 	-2
 #define ABNORMAL_EXIT 	-1
 #define NORMAL_EXIT 	0
-#define START_SHOW_MAINAPP_MENU (1001) //when in book_page,pressing function key,minipos should exit
+#define START_SHOW_MAINAPP_MENU (9001) //when in book_page,pressing function key,minipos should exit
 
 #define MAX_JASON_DATA 4096
 

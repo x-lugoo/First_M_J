@@ -50,7 +50,7 @@ int LogDelOne(const char *pszDate);
 int LogDelAll(void);
 const char* LogGetLastErrMsg(void);
 const char* LogGetVer(void);
-int Pax_Log(LOG_T Prio, const char *fmt, ...);
+int PaxLog(LOG_T Prio, const char *fmt, ...);
 #define _LOG(cLogLevel, pszParaInfo) LogWrite((char)cLogLevel, (const char *)pszParaInfo)
 
 #ifdef __cplusplus

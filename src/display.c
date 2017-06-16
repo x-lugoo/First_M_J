@@ -212,7 +212,7 @@ void *SettleProductSel(void)
 {
     
 	pthread_mutex_lock(&selectProdInitMutex);
-	Pax_Log(LOG_INFO,"start thread to select product");
+	PaxLog(LOG_INFO,"start thread to select product");
 	glStartSelProductThread = 1;
 	settle_page_refresh();
 	settle_title_refresh();
@@ -263,7 +263,7 @@ static int MapKeyIndex(int iKey) {
     return -1;
 }
 
-int Init_Display(void)
+int InitDisplay(void)
 {
 	int iRet=0;
 	XuiColor tColorTitleBg;
@@ -293,15 +293,15 @@ int Init_Display(void)
 	sg_iClockY = XUI_CENTER_Y(0, XuiStatusbarCanvas()->height, sg_iClockHeight);
 
 	iRet = OsWlCheck();
-	Pax_Log(LOG_INFO, "OsWlCheck ret = %d", iRet);
+	PaxLog(LOG_INFO, "OsWlCheck ret = %d", iRet);
 	if ( RET_OK == iRet ) {
 		sg_iGprsOpened = 1;
 	}
 	iRet = OsWifiCheck(szCurESSID, NULL, &iCurRSSI);
-	Pax_Log(LOG_INFO, "OsWifiCheck ret = %d", iRet);
+	PaxLog(LOG_INFO, "OsWifiCheck ret = %d", iRet);
 	if ( RET_OK == iRet ) {
 		sg_iWifiOpened = 1;
-		Pax_Log(LOG_INFO, "szCurESSID = %s", szCurESSID);
+		PaxLog(LOG_INFO, "szCurESSID = %s", szCurESSID);
 	}
 	UpdateStatusbar();
 	pthread_create(&thread, NULL, thread_StatusBarRefresh, NULL);
@@ -309,7 +309,7 @@ int Init_Display(void)
 	return OT_OK;
 }
 
-void Destroy_Display(void)
+void DestroyDisplay(void)
 {
 	if ( imgOrdLogo )
 		XuiImgFree(imgOrdLogo);
@@ -322,7 +322,7 @@ void Destroy_Display(void)
 	GuiDeinit();
 }
 
-void Beep_Prompt(char cFlag)
+void BeepPrompt(char cFlag)
 {
 	if ( cFlag == 0 ) {
 		OsBeep(5, 100);
@@ -336,7 +336,7 @@ void Beep_Prompt(char cFlag)
 	}
 }
 
-static void Display_Title(const char *psztitle)
+static void DisplayTitle(const char *psztitle)
 {
 	char* szOrdLogoFile = "./res/ordrestyring_logo.png";
 //	XuiImg *imgOrdLogo = NULL;
@@ -434,7 +434,7 @@ int DrawText(INPUT_BOX* pInputBox)
 		iTextX = pInputBox->iPosX+2;
 	}
 	iTextY = pInputBox->iPosY;
-	
+	strcat(pTmpTxt,"00");
 	PubConvAmount((uchar*)"",pTmpTxt,2,0,szDisplayAmount,GA_SEPARATOR);
 	pPoint = strchr(szDisplayAmount, '.');
 	if(pPoint)
@@ -502,13 +502,13 @@ static int GetInput(INPUT_BOX* pstInputBox)
 			{
 				continue ;
 			}
-			if(iVaildKeyCount >= 8)
+			if(iVaildKeyCount >= 7)
 			{
 				OsBeep(7, 50);
                 continue;
 			}
 			iVaildKeyCount++;
-			Pax_Log(LOG_INFO, "iVaildKeyCount=%d",iVaildKeyCount);
+			PaxLog(LOG_INFO, "iVaildKeyCount=%d",iVaildKeyCount);
             iLastKey = MapKeyIndex(iKey);
             iIndex = 0;
 
@@ -536,7 +536,7 @@ static int GetInput(INPUT_BOX* pstInputBox)
             }
 		}
 
-		Pax_Log(LOG_INFO, "key value %u", iKey);
+		PaxLog(LOG_INFO, "key value %u", iKey);
 	}
 
 	return iKey;
@@ -580,7 +580,7 @@ int GetFormantAmount(double* amount)
 	int iNextBntHeight;
 
 	//draw title
-	Display_Title("TYPE IN AMOUNT");
+	DisplayTitle("TYPE IN AMOUNT");
 
 	//show "Indtast faktura number"
 	iTopTextWidth = XuiTextWidth(g_ptXuiFont, iTextHeight, szTopText);
@@ -607,7 +607,7 @@ int GetFormantAmount(double* amount)
 	//draw  "----------------------------"
 	iDashLineX = 19;
 	iDashLineY = stVoiceNumInputBox.iPosY+stVoiceNumInputBox.iHeight;
-	imgDottedline = XuiImgLoadFromFile(Add_Prefix_Res_Path("ga_dottedlinebl.png"));
+	imgDottedline = XuiImgLoadFromFile(AddPrefixResPath("ga_dottedlinebl.png"));
 	XuiCanvasDrawImg(XuiRootCanvas(), iDashLineX, iDashLineY, XuiRootCanvas()->width - 38, 1,XUI_BG_CENTER, imgDottedline);
 
 	iConfirmAreaX = XuiRootCanvas()->width - (XuiRootCanvas()->width / 3) -20;
@@ -649,7 +649,7 @@ int GetFormantAmount(double* amount)
 	}
 	if(iRetKey == XUI_KEYENTER)
 	{
-		Pax_Log(LOG_INFO, "szText=%s", stVoiceNumInputBox.szText);
+		PaxLog(LOG_INFO, "szText=%s", stVoiceNumInputBox.szText);
 		iInputLen = strlen(stVoiceNumInputBox.szText);
 		if(iInputLen >= 3)
 		{
@@ -678,7 +678,7 @@ int GetFormantAmount(double* amount)
 		 	memcpy(pszAmount,stVoiceNumInputBox.szText,2);
 		 	*amount = atof(szAmount);
 		 }
-		Pax_Log(LOG_INFO, "szText=%s,pszAmount=%s,*amount=%f", stVoiceNumInputBox.szText,szAmount,*amount);
+		PaxLog(LOG_INFO, "szText=%s,pszAmount=%s,*amount=%f", stVoiceNumInputBox.szText,szAmount,*amount);
 	}
 	//do cleaning
 clean:	
@@ -780,7 +780,7 @@ void HidePromptWin(void)
 	XuiShowWindow(prompt_win_addr(),XUI_HIDE, 0);
 }
 
-void Display_Prompt(const char *psztitle, const char *pszStr, MSGTYPE eMsgType, int iNeedConfirm)
+void DisplayPrompt(const char *psztitle, const char *pszStr, MSGTYPE eMsgType, int iNeedConfirm)
 {
 	int iPromptHeight=0;
 	int iConfirmHeight=0;
@@ -834,22 +834,22 @@ void Display_Prompt(const char *psztitle, const char *pszStr, MSGTYPE eMsgType, 
 		iStrWidth = XuiTextWidth(g_ptXuiFont, iPromptHeight, psztitle);
 		iStrX = XUI_CENTER_X(0, XuiRootCanvas()->width, iStrWidth);
 		iStrY = XUI_CENTER_Y(0, iGreyAreaHeight, iPromptHeight);
-		XuiCanvasDrawText(prompt_win_addr(), iStrX, iStrY, iPromptHeight, g_ptXuiFont, 0, tColorBlack, psztitle);
-
+		XuiCanvasDrawText(prompt_win_addr(), iStrX, iStrY, 16, g_ptXuiFont, 0, tColorBlack, psztitle);
+		
 		iPosX = XUI_CENTER_X(0, XuiRootCanvas()->width, iGifSize);
 		iPosY = XUI_CENTER_Y(0, XuiRootCanvas()->height, iGifSize);
 
 		if ( eMsgType == MSGTYPE_LOADING || eMsgType == MSGTYPE_UPLOADING) {
-			g_ptGifLoader = XuiCreateGif(prompt_win_addr(), iPosX, iPosY, iGifSize, iGifSize, Add_Prefix_Res_Path("loader_loading.gif"));
+			g_ptGifLoader = XuiCreateGif(prompt_win_addr(), iPosX, iPosY, iGifSize, iGifSize, AddPrefixResPath("loader_loading.gif"));
 		} else if ( eMsgType == MSGTYPE_SUCCESS || MSGTYPE_PRINT == eMsgType) {
-			g_ptGifLoader = XuiCreateGif(prompt_win_addr(), iPosX, iPosY, iGifSize, iGifSize, Add_Prefix_Res_Path("loader_success.gif"));
-			Beep_Prompt(0);
+			g_ptGifLoader = XuiCreateGif(prompt_win_addr(), iPosX, iPosY, iGifSize, iGifSize, AddPrefixResPath("loader_success.gif"));
+			BeepPrompt(0);
 		} else if ( eMsgType == MSGTYPE_WARNING ) {
-			g_ptGifLoader = XuiCreateGif(prompt_win_addr(), iPosX, iPosY, iGifSize, iGifSize, Add_Prefix_Res_Path("loader_warning.gif"));
-			Beep_Prompt(1);
+			g_ptGifLoader = XuiCreateGif(prompt_win_addr(), iPosX, iPosY, iGifSize, iGifSize, AddPrefixResPath("loader_warning.gif"));
+			BeepPrompt(1);
 		} else {
-			g_ptGifLoader = XuiCreateGif(prompt_win_addr(), iPosX, iPosY, iGifSize, iGifSize, Add_Prefix_Res_Path("loader_fail.gif"));
-			Beep_Prompt(1);
+			g_ptGifLoader = XuiCreateGif(prompt_win_addr(), iPosX, iPosY, iGifSize, iGifSize, AddPrefixResPath("loader_fail.gif"));
+			BeepPrompt(1);
 		}
 
 		//do not check needconfirm flag
@@ -865,7 +865,7 @@ void Display_Prompt(const char *psztitle, const char *pszStr, MSGTYPE eMsgType, 
 			}
 		}
 		iStrX = XUI_CENTER_X(0, XuiRootCanvas()->width, iStrWidth);
-		XuiCanvasDrawText(prompt_win_addr(), iStrX, XuiRootCanvas()->height - 2 * iConfirmHeight - 2 - 20, iConfirmHeight, g_ptXuiFont, 0, tColorBlack, pszStr);
+		XuiCanvasDrawText(prompt_win_addr(), iStrX, XuiRootCanvas()->height - 2 * iConfirmHeight - 2 - 20, 16, g_ptXuiFont, 0, tColorBlack, pszStr);
 
 		if ( eMsgType == MSGTYPE_LOADING || MSGTYPE_PRINT == eMsgType || eMsgType == MSGTYPE_UPLOADING)
 		{		

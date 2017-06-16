@@ -107,7 +107,8 @@ int node_get_btn_bg_color(NODE_T *node)
 		if (get_menu_stat()==menu_stat_settle()) {
 			return minipos_page_background_color();
 		}
-		return minipos_title_background_color();
+		//return minipos_title_background_color();
+		return minipos_product_button_color();
 	}
 	return 0xff0000ff;
 }

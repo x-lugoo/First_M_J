@@ -12,7 +12,7 @@
 #include <stdio.h>
 #define REF_AREA
 XuiColor create_xui_color(int argb_hex);
-int glSelVarPriceFlag = 1;
+int glSelVarPriceFlag = 0;
 #undef REF_AREA
 
 #define PAGE_AREA
@@ -102,12 +102,11 @@ int book_page_refresh()
 	//TIMER_START_DEF
 	char signNamepath[20];
 	XuiShowWindow(book_menu_win(),XUI_SHOW,0);
-	//XuiClearArea(book_page_win(),book_page_win_x(),book_page_win_y(),book_page_win_width(),book_page_win_height());
 	int i;
 	int iVaildNodeCount = 0;
 	int count=page_btn_count();
 	void *node=node_get_seq_son_node(book_menu_get_cur_page_node(),cur_page_get_index()*book_page_btn_count_max());
-   // XuiShowWindow(book_sign_win_addr(),XUI_SHOW,0);
+   
 	for (i=0;i!=count;++i) {
 		XuiWindow *btn=page_btn_index(i);
 		if (node) {
@@ -186,10 +185,16 @@ int book_page_process()
 		if (XuiHasKey()) {
 			key=XuiGetKey();
 		} else {
-			if (OsTimerCheck(&timer)==0) {return page_code_timeout_eixt();}
+			if (OsTimerCheck(&timer)==0)
+			{
+				 OsSysSleepEx(1);
+				 OsTimerSet(&timer,book_menu_exit_delay_ms());
+				//return page_code_timeout_eixt();
+			}
 			continue;
 		}
 		OsTimerSet(&timer,book_menu_exit_delay_ms());
+		
 
 		{//check whether select function
 			if (key==key_code_back()) {
@@ -225,7 +230,7 @@ int book_page_process()
 					return page_code_to_son_page();
 				} else if (node) {        //added by jeff_xiehuan20170520
 					set_select_product_node(node);
-					Pax_Log(LOG_INFO,"Varprice=%d,F=%s:Line:%d",product_node_get_ifVariable_price(node),
+					PaxLog(LOG_INFO,"Varprice=%d,F=%s:Line:%d",product_node_get_ifVariable_price(node),
 									__FUNCTION__,__LINE__);
 					if(product_node_get_ifVariable_price(node))
 					{
@@ -237,14 +242,14 @@ int book_page_process()
 						 if((int)amount == 0)
 						 {
 						 	glSelVarPriceFlag = 1;
-						 	Pax_Log(LOG_INFO,"getAmount=%d,F:%s,Line:%d",(int)amount,__FUNCTION__,__LINE__);
+						 	PaxLog(LOG_INFO,"getAmount=%d,F:%s,Line:%d",(int)amount,__FUNCTION__,__LINE__);
 						 }
 						 else 
 						 {
 							 
 							 product_node_set_price(node,(int)amount);
 							 prouduct_node_set_vat(node,(double)((int)amount) / 5);
-							 Pax_Log(LOG_INFO,"getAmount=%d,F:%s,Line:%d",(int)amount,__FUNCTION__,__LINE__);
+							 PaxLog(LOG_INFO,"getAmount=%d,F:%s,Line:%d",(int)amount,__FUNCTION__,__LINE__);
 						 }
 					}
 					return page_code_select_product();

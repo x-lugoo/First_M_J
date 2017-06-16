@@ -541,7 +541,7 @@ const char* LogGetLastErrMsg(void)
 	return &g_szErrInfo[0];
 }
 
-int Pax_LogInit(const char* pszTag)
+int PaxLogInit(const char* pszTag)
 {
 #ifdef DEBUG_LOG_OPEN
     OsLogSetTag(pszTag);
@@ -553,7 +553,7 @@ int Pax_LogInit(const char* pszTag)
     return 0;
 }
 
-int Pax_Log(LOG_T Prio, const char *fmt, ...)
+int PaxLog(LOG_T Prio, const char *fmt, ...)
 {
 #ifdef DEBUG_LOG_OPEN
     va_list vaMarker;

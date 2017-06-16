@@ -63,7 +63,7 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
 	memset(printShowVatBuff,0,sizeof(printShowVatBuff));
 	//format total Amount
 	FormatFloat(glOrderAllProduct.totalPrice,ucTempAmount);
-	Pax_Log(LOG_INFO,"ucTempAmount=%s,fun:%s,line:%d",ucTempAmount,__FUNCTION__,__LINE__);
+	PaxLog(LOG_INFO,"ucTempAmount=%s,fun:%s,line:%d",ucTempAmount,__FUNCTION__,__LINE__);
 	PubConvAmount((uchar*)"",ucTempAmount,2,0,ucTotalAmount,GA_SEPARATOR);
 	pPoint = NULL;
 	pPoint = strchr(ucTotalAmount, '.');
@@ -74,7 +74,7 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
 
      //format vat
 	FormatFloat(glOrderAllProduct.totalVat,printVatBuff);
-	Pax_Log(LOG_INFO,"printVatBuff=%s,fun:%s,line:%d",printVatBuff,__FUNCTION__,__LINE__);
+	PaxLog(LOG_INFO,"printVatBuff=%s,fun:%s,line:%d",printVatBuff,__FUNCTION__,__LINE__);
 	PubConvAmount((uchar*)"",printVatBuff,2,0,printShowVatBuff,GA_SEPARATOR);
 	pPoint = NULL;
 	pPoint = strchr(printShowVatBuff, '.');
@@ -83,26 +83,35 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
 		*pPoint = ',';
 	}
 	
-	Pax_Log(LOG_INFO,"start to print receipt");
+	PaxLog(LOG_INFO,"start to print receipt");
 	OsGetTime(&curTime);
 	iRet = OsPrnOpen(PRN_REAL,NULL);
 	if(iRet)
 	{
-		//Init_Display();
-		Display_Prompt("ERROR", "PRINT FAIL", MSGTYPE_WARNING, 0);
+		//InitDisplay();
+		DisplayPrompt("ERROR", "PRINT FAIL", MSGTYPE_WARNING, 0);
 		HidePromptWin();
-		Pax_Log(LOG_INFO,"prnOpen,iRet=%d",iRet);
+		PaxLog(LOG_INFO,"prnOpen,iRet=%d",iRet);
 		return iRet;
 	}
 	OsPrnReset();
 	iRet = OsPrnSetFont(PRN_FONT_PATH);
-	Pax_Log(LOG_INFO,"OsPrnSetFont,iRet=%d",iRet);
+	PaxLog(LOG_INFO,"OsPrnSetFont,iRet=%d",iRet);
     
     OsPrnSetSpace(1, 0);
     OsPrnSelectFontSize(15, 48, 15, 48);
     OsPrnPrintf("%s","     SALE RECEIPT\n");
     OsPrnSelectFontSize(15, 34, 15, 34);
+    if(glMainAppData.ticketLine1[0] != 0)
+    {
+    	OsPrnPrintf("%s\n",glMainAppData.ticketLine1);
+    }
+    if(glMainAppData.ticketLine2[0] != 0)
+    {
+    	OsPrnPrintf("%s\n",glMainAppData.ticketLine2);
+    }
     OsPrnPrintf("ORDER ID:%s\n",glMainAppData.orderID);
+    OsPrnPrintf("TM ID:%s\n",glMainAppData.terminalID);
 	OsPrnPrintf("DATE:%02d-%02d-%02d TIME:%02d:%02d\n",
 		curTime.Year-2000,curTime.Month,curTime.Day,curTime.Hour,curTime.Minute);
 	OsPrnPrintf("CURRENCY:%s\n",glCurrencyName);
@@ -149,6 +158,7 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
 			break;
 		case M2M_PAYMENT_TYPE_VOUCHER:
 			strcpy(printBuff,"VOUCHER CARD:");
+			break;
 			default:
 			strcpy(printBuff,"NO PAYMENT TYPE");
 			break;
@@ -164,7 +174,7 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
 	OsPrnPrintf("HERAF MOMS:");
     snprintf(printBuff,24,"%*.*s\n",24-strlen("HERAF MOMS:"),24-strlen("HERAF MOMS:"),printShowVatBuff);
 	OsPrnPrintf("%s%s",printBuff,"\n\n\n\n\n");
-	Display_Prompt("SUCCESS", "PRINTING", MSGTYPE_PRINT, 0);
+	DisplayPrompt("PLEASE WAIT...", "Processing request", MSGTYPE_PRINT, 0);
 	iRet = OsPrnStart();
 	HidePromptWin();
 	if(iRet)
@@ -173,8 +183,8 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
 		if(iRet == ERR_PRN_PAPEROUT)
 		{
 			do{
-				//Init_Display();
-				Display_Prompt("NO PAPER", "PLEASE PUT PAPER", MSGTYPE_WARNING, 0);
+				//InitDisplay();
+				DisplayPrompt("NO PAPER", "PLEASE PUT PAPER", MSGTYPE_WARNING, 0);
 				if(XuiHasKey())
 				{
 					iKey = XuiGetKey();
@@ -193,11 +203,11 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
          }
 		else
 		{
-			//Init_Display();
-			Display_Prompt("ERROR", "PRINT FAIL", MSGTYPE_FAILURE, 0);
+			//InitDisplay();
+			DisplayPrompt("ERROR", "PRINT FAIL", MSGTYPE_FAILURE, 0);
 			HidePromptWin();
 		}
-		Pax_Log(LOG_INFO,"OsPrnStart,iKey = %d,iRet=%d",iKey,iRet);
+		PaxLog(LOG_INFO,"OsPrnStart,iKey = %d,iRet=%d",iKey,iRet);
 	}
 
 	OsPrnClose();

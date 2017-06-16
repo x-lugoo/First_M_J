@@ -60,7 +60,7 @@ XuiWindow *settle_keypad_btn_index(int i)
             	btn_x -= 24;
             	bf_set_width(settle_keypad_btn_width() + 34);
             }
-			//Pax_Log(LOG_INFO,"btn[%d]<x_seq:%d, y_seq:%d> <x:%d,y:%d,w:%d,h:%d>",i,x_seq,y_seq,btn_x,btn_y,settle_keypad_btn_width(),settle_keypad_btn_height());
+			//PaxLog(LOG_INFO,"btn[%d]<x_seq:%d, y_seq:%d> <x:%d,y:%d,w:%d,h:%d>",i,x_seq,y_seq,btn_x,btn_y,settle_keypad_btn_width(),settle_keypad_btn_height());
 			bf_set_x(btn_x);
 			bf_set_y(btn_y);
 			s_btn_list[i]=create_xui_button();
@@ -184,13 +184,11 @@ int settle_keypad_btn_ensure_refresh()
 	XuiButtonStat stat;memset(&stat,0,sizeof(stat));
 	stat.btn_bg=create_xui_color(settle_keypad_btn_ensure_bg_color());			
 	stat.img=settle_keypad_btn_ensure_img();
-	//stat.img_x=settle_keypad_btn_ensure_img_x();
 	stat.img_x = settle_keypad_btn_width() + 9;
 	stat.img_y=settle_keypad_btn_ensure_img_y();
 	
 	stat.text=settle_keypad_btn_ensure_text();
 	stat.text_height=settle_keypad_btn_ensure_text_height();
-	//stat.text_x=settle_keypad_btn_ensure_text_x();
 	stat.text_x=0;
 	if(strcmp(stat.text,"Next") == 0)
 	{
@@ -245,8 +243,7 @@ int settle_keypad_btn_delete_refresh()
 	//set btn view
 	XuiButtonStat stat;memset(&stat,0,sizeof(stat));
 	stat.btn_bg=create_xui_color(settle_keypad_btn_delete_bg_color());			
-	stat.img=settle_keypad_btn_delete_img();
-	//stat.img_x=settle_keypad_btn_delete_img_x();
+	stat.img = NULL;//remove delete icon
 	stat.img_y=settle_keypad_btn_delete_img_y();
 	stat.img_x=50;
 	stat.text=settle_keypad_btn_delete_text();
@@ -311,7 +308,6 @@ int settle_keypad_btn_add_refresh()
 	XuiButtonStat stat;memset(&stat,0,sizeof(stat));
 	stat.btn_bg=create_xui_color(settle_keypad_btn_add_bg_color());			
 	stat.img=settle_keypad_btn_add_img();
-	//stat.img_x=settle_keypad_btn_add_img_x();
 	stat.img_y=settle_keypad_btn_add_img_y();
 	stat.img_x=10;
 	stat.text=settle_keypad_btn_add_text();

@@ -26,7 +26,6 @@ int key_code_delete() {return XUI_KEYCLEAR;}
 int key_code_add() {return XUI_KEYALPHA;}
 
 #define KEYPAD_BTN_AREA
-//int keypad_btn_text_height() {return book_keypad_btn_height()*2/5;}
 int keypad_btn_text_height() {return 16;}
 
 int keypad_btn_text_gap() {return 2*pu();}

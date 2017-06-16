@@ -34,7 +34,7 @@ XuiWindow *book_keypad_btn_index(int i)
 			int y_seq=i/book_keypad_btn_count_x_max();
 			int btn_x=x_seq*book_keypad_btn_width() + (x_seq+1)*book_keypad_btn_x_gap();
 			int btn_y=y_seq*book_keypad_btn_height() + (y_seq+1)*book_keypad_btn_y_gap();
-			//Pax_Log(LOG_INFO,"btn_x=%d,btn_y=%d",btn_x,btn_y);
+			//PaxLog(LOG_INFO,"btn_x=%d,btn_y=%d",btn_x,btn_y);
 			bf_set_x(btn_x);
 			bf_set_y(btn_y);
 			s_btn_list[i]=create_xui_button();
