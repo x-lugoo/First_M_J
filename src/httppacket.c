@@ -19,6 +19,9 @@
 #include <time.h>
 
 static char *spRetJson;
+int glUploadFailToMainScreenFlag = 0;//if upload fail,will back to minipos main screen
+struct currentJsonData glCurUploadJsonData;
+
 
 int GetRequestJson(char *pszJsonData, int iBufSize,REQUESTCMD ePackCmd)
 {
@@ -28,40 +31,35 @@ int GetRequestJson(char *pszJsonData, int iBufSize,REQUESTCMD ePackCmd)
 	{
 		return 0;
 	}
-	else if(ePackCmd == CMD_UPLOAD_DATA && glReverFlag == '0')
+	else if(ePackCmd == CMD_UPLOAD_DATA)
 	{
-		iRet = PackOrderApiJson(pszJsonData);
-		if(iRet)
+		if(glStartOfflineUploadMode == 1)
 		{
-			return iRet;
+			struct currentJsonData currentTmpJson;
+			memset(&currentTmpJson,0,sizeof(currentTmpJson));
+			iRet = ReadOffLineFile(OFFSET_TRAN_FILE,sizeof(struct currentJsonData) * glCurrentOfflineIdx,
+				&currentTmpJson,sizeof(struct currentJsonData));
+			if(iRet)
+			{
+				return iRet;
+			}
+			strcpy(pszJsonData,currentTmpJson.jsonData);
+			
 		}
-		if(strlen(pszJsonData) > iBufSize)
+		else
 		{
-			return -1;
+			iRet = PackOrderApiJson(pszJsonData);
+			if(iRet)
+			{
+				return iRet;
+			}
+			if(strlen(pszJsonData) > iBufSize)
+			{
+				return -1;
+			}
+			strcpy(glCurUploadJsonData.jsonData,pszJsonData);
 		}
-		iRet = SaveFile(FILE_REVERSAL,pszJsonData,strlen(pszJsonData));
-		if(iRet)
-		{
-			return iRet;
-		}
-		return 0;
-	}       //if the next upload is fail,will remove all the uploading data
-	else if(ePackCmd == CMD_UPLOAD_DATA && glReverFlag == '1') 
-	{
-		glReverFlag = '0';
-		iRet = SaveFile(FILE_REVERSALFlAG,&glReverFlag,1);
-		if(iRet)
-		{
-			return iRet;
-		}
-		iRet = LoadReverdata(pszJsonData);
-		if(iRet)
-		{
-			return iRet;
-		}
-		remove(FILE_REVERSAL);
-	}
-	
+	}      
 	return 0;
 }
 /********************************************************
@@ -270,15 +268,18 @@ static int GetPutProcess(char *pszUrl, char *pszAPIKey, char *pszJsonData, long 
 		return OT_ERR_INVALID_PARAM;
 	}
     HidePromptWin();
-    if(ePackCmd == CMD_GET_TXNINFO)
+    if(ePackCmd == CMD_GET_TXNINFO && glStartOfflineUploadMode == 0)
     {
     	DisplayPrompt("PLEASE WAIT", "Processing request...", MSGTYPE_UPLOADING, 0);
     }
-    else if(ePackCmd == CMD_UPLOAD_DATA)
+    else if(ePackCmd == CMD_UPLOAD_DATA && glStartOfflineUploadMode == 0)
     {
     	 DisplayPrompt("PLEASE WAIT", "Processing request...", MSGTYPE_UPLOADING, 0);
+    }
+    if(glStartOfflineUploadMode == 1)
+    {
+   		DisplayPrompt("OFFLINE FULL", "Processing offline transactions...", MSGTYPE_UPLOADING, 0);
     }	
-   
 	spRetJson = pszRetJsonData;
 	PaxLog(LOG_INFO, "%s - %d pszUrl = %s", __FUNCTION__, __LINE__, pszUrl);
 	PaxLog(LOG_INFO, "%s - %d pszAPIKey = %s", __FUNCTION__, __LINE__, pszAPIKey);
@@ -384,27 +385,25 @@ int RequestProcess(REQUESTCMD ePackCmd,int iUpdateJsonFlag)
 	iRet = GetPutProcess(szUrl, szAPIKey, szJsonData, &lRetcode, szRetJsonData, ePackCmd);
 	if(iRet)
 	{
-		if(ePackCmd == CMD_UPLOAD_DATA && access(FILE_REVERSAL,F_OK) >= 0)
+		if(ePackCmd == CMD_UPLOAD_DATA && glStartOfflineUploadMode == 0)
 		{
-			glReverFlag = '1';
-			iSaveFileRet = SaveFile(FILE_REVERSALFlAG,&glReverFlag,1);
-			if(iSaveFileRet)
-			{
-				PaxLog(LOG_INFO,"iRet =%d			fun:%s-line:%d",iRet,__FUNCTION__,__LINE__);
-				return iSaveFileRet;
-			}
-			
-		}
+			glUploadFailToMainScreenFlag = 1;
+		}	
+		PaxLog(LOG_INFO,"iRet =%d glUploadFailToMainScreenFlag=%d			fun:%s-line:%d",iRet,
+		 glUploadFailToMainScreenFlag,__FUNCTION__,__LINE__);
 		return iRet;
 	}
 	iRet = ResultProcess(lRetcode, szRetJsonData,ePackCmd,iUpdateJsonFlag);
 	if(iRet)
 	{
-		PaxLog(LOG_INFO,"iRet =%d			fun:%s-line:%d",iRet,__FUNCTION__,__LINE__);
+		if(ePackCmd == CMD_UPLOAD_DATA && glStartOfflineUploadMode == 0)
+		{
+			glUploadFailToMainScreenFlag = 1;
+		}
+		PaxLog(LOG_INFO,"iRet =%d glUploadFailToMainScreenFlag=%d			fun:%s-line:%d",iRet,
+		 glUploadFailToMainScreenFlag,__FUNCTION__,__LINE__);
 		return iRet;
 	}
-	PaxLog(LOG_INFO,"removingFILE_REVERSAL	fun:%s-line:%d",__FUNCTION__,__LINE__);
-	remove(FILE_REVERSAL);//process success,remove reversal data
 	return 0;
 }
 

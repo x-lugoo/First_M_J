@@ -39,6 +39,21 @@ void FormatFloat(double price,uchar *pszOutput)
 	strcpy(pszOutput,ucTempAmount);
 }
 
+int PrintBlank(int num)
+{
+	int i;
+	char szPrintBuff[25];
+
+	if(num <= 0 || num >= 24)
+	{
+		return -1;
+	}
+	memset(szPrintBuff,0,sizeof(szPrintBuff));
+	memset(szPrintBuff,' ',num);
+	OsPrnPrintf(szPrintBuff);
+	return 0;
+}
+
 int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
 {
 	int iRet;
@@ -100,14 +115,16 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
     
     OsPrnSetSpace(1, 0);
     OsPrnSelectFontSize(15, 48, 15, 48);
-    OsPrnPrintf("%s","     SALE RECEIPT\n");
+    OsPrnPrintf("%s","     SALES RECEIPT\n");
     OsPrnSelectFontSize(15, 34, 15, 34);
-    if(glMainAppData.ticketLine1[0] != 0)
+    if(glMainAppData.ticketLine1[0] != 0) //print receipt 1 position center
     {
+    	PrintBlank((24 - strlen(glMainAppData.ticketLine1)) / 2);
     	OsPrnPrintf("%s\n",glMainAppData.ticketLine1);
     }
-    if(glMainAppData.ticketLine2[0] != 0)
+    if(glMainAppData.ticketLine2[0] != 0) //print receipt 2 position center
     {
+    	PrintBlank((24 - strlen(glMainAppData.ticketLine2)) / 2);
     	OsPrnPrintf("%s\n",glMainAppData.ticketLine2);
     }
     OsPrnPrintf("ORDER ID:%s\n",glMainAppData.orderID);

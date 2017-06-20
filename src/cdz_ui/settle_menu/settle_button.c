@@ -57,8 +57,10 @@ XuiWindow *settle_keypad_btn_index(int i)
             }
             else if(i == 3)
             {
-            	btn_x -= 24;
-            	bf_set_width(settle_keypad_btn_width() + 34);
+            	//btn_x -= 24;
+            	btn_x -= 29;
+            	//bf_set_width(settle_keypad_btn_width() + 34);
+            	bf_set_width(settle_keypad_btn_width() + 39);
             }
 			//PaxLog(LOG_INFO,"btn[%d]<x_seq:%d, y_seq:%d> <x:%d,y:%d,w:%d,h:%d>",i,x_seq,y_seq,btn_x,btn_y,settle_keypad_btn_width(),settle_keypad_btn_height());
 			bf_set_x(btn_x);
@@ -192,7 +194,7 @@ int settle_keypad_btn_ensure_refresh()
 	XuiButtonStat stat;memset(&stat,0,sizeof(stat));
 	stat.btn_bg=create_xui_color(settle_keypad_btn_ensure_bg_color());			
 	stat.img=settle_keypad_btn_ensure_img();
-	stat.img_x = settle_keypad_btn_width() + 9;
+	stat.img_x = settle_keypad_btn_width() + 13;
 	stat.img_y=settle_keypad_btn_ensure_img_y();
 	
 	stat.text=settle_keypad_btn_ensure_text();
@@ -200,7 +202,7 @@ int settle_keypad_btn_ensure_refresh()
 	stat.text_x=0;
 	if(strcmp(stat.text,"Next") == 0)
 	{
-		stat.text_x = 27;
+		stat.text_x = 31;
 	}
 	stat.text_y=settle_keypad_btn_ensure_text_y();
 	stat.text_font=settle_keypad_btn_ensure_text_font();

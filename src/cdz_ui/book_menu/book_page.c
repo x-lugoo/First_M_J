@@ -10,9 +10,16 @@
 #include <string.h>
 #include "pax_log.h"
 #include <stdio.h>
+#include "Display.h"
+#include "dataExchange.h"
 #define REF_AREA
 XuiColor create_xui_color(int argb_hex);
 int glSelVarPriceFlag = 0;
+int glStartOfflineUploadMode = 0;
+int glCurrentOfflineIdx = 0;
+
+
+#define MAX_OFFLINE_UPLOAD_NUM 10
 #undef REF_AREA
 
 #define PAGE_AREA
@@ -179,9 +186,44 @@ int set_select_product_node(void *node) {s_select_node=node;return 0;}
 int book_page_process()
 {
 	ST_TIMER timer={0};
+	int iBatteryLevel;
 	OsTimerSet(&timer,book_menu_exit_delay_ms());
+	int i;
+	int iRet;
+	
 	while (1) {
 		int key=0;
+		iBatteryLevel = OsCheckBattery();
+		if(iBatteryLevel == BATTERY_LEVEL_0)
+		{
+			XuiShowWindow(book_menu_win(),XUI_HIDE,0);
+			DisplayPrompt("LOW BATTERY", "please charge your terminal", MSGTYPE_WARNING, 0);
+			HidePromptWin();
+			XuiShowWindow(book_menu_win(),XUI_SHOW,0);
+		}
+		if(glOfflineNum == MAX_OFFLINE_UPLOAD_NUM)
+		{
+			XuiShowWindow(book_menu_win(),XUI_HIDE,0);
+			glStartOfflineUploadMode = 1;
+			do
+			{
+				for(i = 0;i < MAX_OFFLINE_UPLOAD_NUM;i++)
+				{
+					glCurrentOfflineIdx = i;
+					iRet = RequestProcess(CMD_UPLOAD_DATA,NORMAL);
+					if(iRet)
+					{
+						break;
+					}
+				}
+			}while(iRet);
+			glStartOfflineUploadMode = 0;
+			glOfflineNum = 0;
+			HidePromptWin();
+			remove(OFFSET_TRAN_FILE);
+			remove(OFFSET_NUM_FILE);
+			XuiShowWindow(book_menu_win(),XUI_SHOW,0);
+		}
 		if (XuiHasKey()) {
 			key=XuiGetKey();
 		} else {
@@ -189,7 +231,7 @@ int book_page_process()
 			{
 				 OsSysSleepEx(1);
 				 OsTimerSet(&timer,book_menu_exit_delay_ms());
-				//return page_code_timeout_eixt();
+				
 			}
 			continue;
 		}

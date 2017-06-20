@@ -9,14 +9,14 @@
 
 
 #define JSON_FILE  				"./data/json/newjason.dat"
-
+		
 struct miniposToMainapp glMiniPosData;
 struct mainappToMinipos glMainAppData;
 
+uchar glOfflineNum = 0;
 int glTotalCount;
 double glTotalPrice;
 double glTotalVat;
-char glReverFlag; //reversal flag
 char *glCurrencyName = "DKK"; //init current,but get from mainapp
 extern double settle_product_vat();
 extern double product_node_get_vat(FNODE_T *node);
@@ -103,36 +103,6 @@ int menu_exec(MENU_SELECTION menuStat){
 return 0;
 }
 
-
-
-
-int HandleReversal(void)
-{
-	int iRet;
-
-	if(access(FILE_REVERSALFlAG,F_OK) < 0)
-	{
-		PaxLog(LOG_DEBUG,"%s,Line:%d",__FUNCTION__,__LINE__);  //if reversal file is not exist,return 0;
-		glReverFlag = '0';
-		return 0;
-	}
-	iRet = ReadFile(FILE_REVERSALFlAG,&glReverFlag,1);
-	PaxLog(LOG_DEBUG,"iRet=%d,glReverFlag=%c,%s,Line:%d",iRet,glReverFlag,__FUNCTION__,__LINE__);
-	if(iRet)
-	{
-		return iRet;
-	}
-	if(glReverFlag == '1')
-	{
-		PaxLog(LOG_DEBUG,"start to process reversal%s,Line:%d",__FUNCTION__,__LINE__);  //if re
-		iRet = RequestProcess(CMD_UPLOAD_DATA,NORMAL);
-		if(iRet)
-		{
-			return iRet;
-		}
-	}
-	return 0;
-}
 
 
 int SaveMainAppDataForTest(void)  //for test com with MAINAPP
@@ -321,36 +291,6 @@ int LoadMainDataForMini(struct mainappToMinipos *pRequest)
 }
 
 
-int LoadReverdata(char *pszJsonData)
-{
-	int iLen;
-	int iFileLen;
-	int iFd;
-
-	if(access(FILE_REVERSAL, F_OK) < 0) 
-	{
-		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
-		return FILE_ERR_NOT_EXIST;
-	}
-
-	iFileLen = Filesize(FILE_REVERSAL);
-
-	iFd = open(FILE_REVERSAL,O_RDONLY);
-	if (iFd < 0) {
-		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
-		return FILE_ERR_OPEN_FAIL;
-	}
-	iLen = read(iFd,pszJsonData,iFileLen);
-	if(iLen != iFileLen)
-	{
-		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
-		close(iFd);
-		return FILE_ERR_INVLIDE_DATA;
-	}
-	close(iFd);
-	return OT_OK;
-}
-	
 
 int ReadJason(unsigned char *pszStr)
 {
@@ -435,6 +375,94 @@ int SaveFile(const char *pszFileName,const void *psData,int iDataLen)
 	return 0;
 }
 
+int SaveOffLineFile(const char *pszFileName,long lOffset,const void *psData,int iDataLen)
+{
+	int iFd;
+	int iLen;
+	int iRet;
+
+	PaxLog(LOG_DEBUG, "saving file:%s,%s - %d",pszFileName, __FUNCTION__, __LINE__);
+	iFd = open(pszFileName, O_CREAT | O_RDWR, S_IRWXU|S_IRWXG|S_IRWXO);
+	if ( iFd < 0 )
+	{
+		PaxLog(LOG_ERROR, "save file fail,iFd=%d %s - %d",iFd, __FUNCTION__, __LINE__);
+		return FILE_ERR_OPEN_FAIL;
+	}
+	iRet = lseek(iFd,lOffset,1);
+	if (iRet < 0)
+	{
+		close(iFd);
+		return 2;
+	}
+	iLen = write(iFd,psData, iDataLen); //for safe write
+	if(iLen < 0)
+	{
+		return FILE_ERR_WRITE_FAIL;
+	}
+	close(iFd);
+	return 0;
+}
+
+int LoadCurrenUploadJsonData(char *pszJsonData)
+{
+	int iLen;
+	int iFileLen;
+	int iFd;
+
+	if(access(CURRENT_UPLOAD_JSON_FILE, F_OK) < 0) 
+	{
+		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
+		return FILE_ERR_NOT_EXIST;
+	}
+
+	iFileLen = Filesize(CURRENT_UPLOAD_JSON_FILE);
+
+	iFd = open(CURRENT_UPLOAD_JSON_FILE,O_RDONLY);
+	if (iFd < 0) {
+		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
+		return FILE_ERR_OPEN_FAIL;
+	}
+	iLen = read(iFd,pszJsonData,iFileLen);
+	if(iLen != iFileLen)
+	{
+		PaxLog(LOG_ERROR, "%s - %d", __FUNCTION__, __LINE__);
+		close(iFd);
+		return FILE_ERR_INVLIDE_DATA;
+	}
+	close(iFd);
+	return OT_OK;
+}
+
+
+int ReadOffLineFile(const char *pszFileName,long lOffset,const void *psData,int iDataLen)
+{	
+	int iFd;
+	int iLen;
+	int iRet;
+
+	PaxLog(LOG_DEBUG, "reading file:%s,%s - %d",pszFileName, __FUNCTION__, __LINE__);
+	iFd = open(pszFileName,O_RDWR);
+	if ( iFd < 0 )
+	{
+		PaxLog(LOG_ERROR, "save file:%s_fail,iFd=%d %s - %d",pszFileName,iFd, __FUNCTION__, __LINE__);
+		return FILE_ERR_OPEN_FAIL;
+	}
+	iRet = lseek(iFd,lOffset,1);
+	if (iRet < 0)
+	{
+		close(iFd);
+		return 2;
+	}
+	iLen = read(iFd,psData,iDataLen);
+	close(iFd);
+	if(iLen != iDataLen)
+	{
+		return 2;
+	}
+	return 0;
+}
+
+
 int ReadFile(const char *pszFileName,const void *psData,int iDataLen)
 {	
 	int iFd;
@@ -455,6 +483,8 @@ int ReadFile(const char *pszFileName,const void *psData,int iDataLen)
 	}
 	return 0;
 }
+
+
 
 int LoadTerminalProduct(void)
 {
@@ -512,10 +542,24 @@ static int SaveProductDataMiniposData()
 	return 0;
 }
 
+
+
+
 int ProcessStartUp(void)
 {
 	int iRet;
-	
+	if(access(OFFSET_NUM_FILE,F_OK) < 0)
+	{
+		glOfflineNum = 0;
+	}
+	else
+	{
+		iRet = ReadFile(OFFSET_NUM_FILE,&glOfflineNum,1);
+		if(iRet)
+		{
+			return iRet;
+		}
+	}
 	iRet = menu_exec(stat_main_menu);
 	if(iRet)
 	{	
@@ -555,23 +599,12 @@ int ProcessPaymentResult(PAYMENT_RESULT paymentResult)
     switch(paymentResult)
     {
     	case MAIN_PAYRESULT_APPROVED:
-			PaxLog(LOG_INFO,"start to handleReversal 	fun:%s,line:%d",__FUNCTION__,__LINE__);
-			iRet = HandleReversal();
-			if(iRet)
-			{
-				DisplayPrompt("FAIL", "Upload Order Product Fail" ,MSGTYPE_FAILURE, 0);
-				HidePromptWin();
-				DestroyDisplay();
-				break;
-			}
-			PaxLog(LOG_INFO, "%s - %d HandleReversal", __FUNCTION__, __LINE__);
 			iRet = RequestProcess(CMD_UPLOAD_DATA,NORMAL);
 			if(iRet)
 			{
 				PaxLog(LOG_INFO, "RequestProcess iRet=%d %s - %d ",iRet, __FUNCTION__, __LINE__);
 				DisplayPrompt("FAIL", "Upload Order Product Fail" ,MSGTYPE_FAILURE, 0);
 				HidePromptWin();
-				DestroyDisplay();
 				break;
 				
 			}
@@ -582,6 +615,7 @@ int ProcessPaymentResult(PAYMENT_RESULT paymentResult)
 									iRet,__FUNCTION__,__LINE__);
 				return iRet;
 			}
+		
 			iRet = ProcessStartUp();
 			if(iRet)
 			{

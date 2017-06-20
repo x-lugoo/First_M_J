@@ -16,8 +16,9 @@ extern "C"
 #define FILE_MAINAPP_MINIPOS	"/tmp/MAINAPP-MiniPOS.req"
 #define FILE_MINIPOS_MAINAPP	"/tmp/miniPOS-MAINAPP.req"
 #define ORDER_AllPRODUCT_FILE 	"./data/allProduct.dat"
-#define FILE_REVERSALFlAG       "./data/reversalFlag.dat"
-#define FILE_REVERSAL			"./data/reversal.dat"
+#define OFFSET_NUM_FILE				"./data/offsetNum.dat"
+#define OFFSET_TRAN_FILE			"./data/offsetTranFile.dat"
+#define CURRENT_UPLOAD_JSON_FILE   "./data/currentuploadjsonfile.dat"
 
 extern struct miniposToMainapp glMiniPosData;
 extern struct mainappToMinipos glMainAppData;
@@ -26,6 +27,9 @@ extern double glTotalPrice;
 extern double glTotalVat;
 extern char glReverFlag;
 extern char *glCurrencyName;
+extern uchar glOfflineNum;
+extern int glStartOfflineUploadMode;
+extern int glCurrentOfflineIdx;
 
 extern int GetDataFromNodeStruc(void);
 extern int SaveFile(const char *pszFileName,const void *psData,int iDataLen);
@@ -36,9 +40,10 @@ extern int LoadTerminalProduct(void);
 extern int ReadJason(unsigned char *pszStr);
 extern int ProcesssStartUp(void);
 extern int SaveMainAppDataForTest(void);
-extern int LoadReverdata(char *pszJsonData);
-extern int HandleReversal(void);
 extern int menu_exec(MENU_SELECTION menuStat);
+extern int SaveOffLineFile(const char *pszFileName,long lOffset,const void *psData,int iDataLen);
+extern int LoadCurrenUploadJsonData(char *pszJsonData);
+extern int ReadOffLineFile(const char *pszFileName,long lOffset,const void *psData,int iDataLen);
 
 
 

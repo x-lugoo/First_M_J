@@ -67,6 +67,11 @@ struct _orderAllProduct
 	double totalVat;
 };
 
+struct currentJsonData
+{
+	char jsonData[4096];
+};
+
 extern void InitOrderHead(struct _orderHead *orderHead);
 extern int PackOrderApiJson(char *pszOutJsonData);
 extern int HandleReturnOrderJson(char *pszInJsonData);

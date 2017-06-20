@@ -24,6 +24,9 @@ typedef enum _paymentCmd {
 } REQUESTCMD;
 
 
+extern int glUploadFailToMainScreenFlag;
+extern struct currentJsonData glCurUploadJsonData;
+
 
 int ResultProcess(long lRetcode, char *szRetJsonData,REQUESTCMD ePackCmd,int iUpdateJsonFlag);
 int GetRequestJson(char *pszJsonData, int iBufSize,REQUESTCMD ePackCmd);
