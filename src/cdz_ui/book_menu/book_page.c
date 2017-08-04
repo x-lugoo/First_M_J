@@ -19,7 +19,7 @@ int glStartOfflineUploadMode = 0;
 int glCurrentOfflineIdx = 0;
 
 
-#define MAX_OFFLINE_UPLOAD_NUM 10
+#define MAX_OFFLINE_UPLOAD_NUM 18
 #undef REF_AREA
 
 #define PAGE_AREA
@@ -189,7 +189,7 @@ int book_page_process()
 	int iBatteryLevel;
 	OsTimerSet(&timer,book_menu_exit_delay_ms());
 	int i;
-	int iRet;
+	int iRet = 0;
 	
 	while (1) {
 		int key=0;
@@ -201,13 +201,19 @@ int book_page_process()
 			HidePromptWin();
 			XuiShowWindow(book_menu_win(),XUI_SHOW,0);
 		}
-		if(glOfflineNum == MAX_OFFLINE_UPLOAD_NUM)
+		  /*************************************************************************************
+		  *support two modes to upload offline products.One is when stored offline trx reach 10
+		  *  Another is once when upload success,It will check all stored offline trx;
+		  /*************************************************************************************/
+		 
+		if(glOfflineNum == MAX_OFFLINE_UPLOAD_NUM || glStartOfflineUploadMode == 1)
 		{
-			XuiShowWindow(book_menu_win(),XUI_HIDE,0);
-			glStartOfflineUploadMode = 1;
-			do
+			if(glOfflineNum > 0)
 			{
-				for(i = 0;i < MAX_OFFLINE_UPLOAD_NUM;i++)
+				XuiShowWindow(book_menu_win(),XUI_HIDE,0);
+				glStartOfflineUploadMode = 1;
+			
+				for(i = 0;i < glOfflineNum;i++)
 				{
 					glCurrentOfflineIdx = i;
 					iRet = RequestProcess(CMD_UPLOAD_DATA,NORMAL);
@@ -216,20 +222,24 @@ int book_page_process()
 						break;
 					}
 				}
-			}while(iRet);
-			glStartOfflineUploadMode = 0;
-			glOfflineNum = 0;
-			HidePromptWin();
-			remove(OFFSET_TRAN_FILE);
-			remove(OFFSET_NUM_FILE);
-			XuiShowWindow(book_menu_win(),XUI_SHOW,0);
+				glStartOfflineUploadMode = 0;
+				glOfflineNum = 0;
+				HidePromptWin();
+				remove(OFFSET_TRAN_FILE);
+				remove(OFFSET_NUM_FILE);
+				XuiShowWindow(book_menu_win(),XUI_SHOW,0);
+			}
+			else
+			{
+				glStartOfflineUploadMode = 0;
+			}
 		}
 		if (XuiHasKey()) {
 			key=XuiGetKey();
 		} else {
 			if (OsTimerCheck(&timer)==0)
 			{
-				 OsSysSleepEx(1);
+				 OsSysSleepEx(1);//minipos will go to the idle page after no in 30seconds
 				 OsTimerSet(&timer,book_menu_exit_delay_ms());
 				
 			}
@@ -274,7 +284,7 @@ int book_page_process()
 					set_select_product_node(node);
 					PaxLog(LOG_INFO,"Varprice=%d,F=%s:Line:%d",product_node_get_ifVariable_price(node),
 									__FUNCTION__,__LINE__);
-					if(product_node_get_ifVariable_price(node))
+					if(product_node_get_ifVariable_price(node)) //handle variable price products
 					{
 						 double amount = 0.0;
 			

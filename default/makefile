@@ -10,12 +10,8 @@ RM := rm -rf
 -include sources.mk
 -include src/ui/settle_ui/subdir.mk
 -include src/ui/main_ui/subdir.mk
--include src/cdz_ui/settle_menu/subdir.mk
--include src/cdz_ui/payment_menu/subdir.mk
--include src/cdz_ui/data/subdir.mk
--include src/cdz_ui/component/subdir.mk
--include src/cdz_ui/common_menu/subdir.mk
--include src/cdz_ui/book_menu/subdir.mk
+-include src/ui/component/subdir.mk
+-include src/ui/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk

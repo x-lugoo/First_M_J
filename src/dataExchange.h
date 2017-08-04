@@ -121,6 +121,7 @@ struct mainappToMinipos
 	char waiterID[32+1];	// optional waiter ID
 	char ticketLine1[24+1]; // optional ticket line 1
  	char ticketLine2[24+1]; // optional ticket line 2
+ 	char ticketPrintEnabled;// ticket print flag '0' do not print, '1' print
 };
 
 /****************************************************

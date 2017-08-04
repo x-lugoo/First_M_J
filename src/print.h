@@ -9,5 +9,5 @@
 
 void FormatFloat(double price,uchar *pszOutput);
 
-int PrintReceipt(struct _orderLine *orderLine,int orderLineNum);
+int PrintReceipt(struct _orderLine *orderLine,int orderLineNum,char ifPrintFlag);
 #endif

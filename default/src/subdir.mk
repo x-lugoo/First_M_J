@@ -7,7 +7,7 @@ C_SRCS += \
 ../src/base.c \
 ../src/dataExchange.c \
 ../src/display.c \
-../src/handleJson.c \
+../src/handleJason.c \
 ../src/httppacket.c \
 ../src/log.c \
 ../src/main.c \
@@ -19,7 +19,7 @@ OBJS += \
 ./src/base.o \
 ./src/dataExchange.o \
 ./src/display.o \
-./src/handleJson.o \
+./src/handleJason.o \
 ./src/httppacket.o \
 ./src/log.o \
 ./src/main.o \

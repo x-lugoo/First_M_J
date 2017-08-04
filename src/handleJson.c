@@ -49,14 +49,7 @@ int PackOrderApiJson(char *pszOutJsonData)
 		pObjectOrderLine = json_object();
 		json_object_set_new(pObjectOrderLine,"quantity",json_integer(glOrderAllProduct.orderLine[i].quantity));
 		json_object_set_new(pObjectOrderLine,"price",json_integer((int)glOrderAllProduct.orderLine[i].price));
-		//if(glOrderAllProduct.orderLine[i].product_id == 20)
-		//{
-			//json_object_set_new(pObjectOrderLine,"vat",json_integer(0));
-		//}
-		//else
-		//{
-			json_object_set_new(pObjectOrderLine,"vat",json_real(glOrderAllProduct.orderLine[i].vat));
-		//}
+		json_object_set_new(pObjectOrderLine,"vat",json_real(glOrderAllProduct.orderLine[i].vat));
 		json_object_set_new(pObjectOrderLine,"product_id",json_integer(glOrderAllProduct.orderLine[i].product_id));
 		json_array_insert(pArray,i,pObjectOrderLine);
 	}

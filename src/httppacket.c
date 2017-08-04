@@ -256,7 +256,7 @@ static int GetResponseJson(void *data, size_t size, size_t nmemb, void *buffer_i
 }
 
 //static int Send_Recv_Process(char *pszUrl, char *pszAPIKey, char *pszJsonData, long *lRetcode, char *pszRetJsonData)
-static int GetPutProcess(char *pszUrl, char *pszAPIKey, char *pszJsonData, long *lRetcode, char *pszRetJsonData, REQUESTCMD ePackCmd)
+static int GetPutProcess(char *pszUrl,char *pszJsonData, long *lRetcode, char *pszRetJsonData, REQUESTCMD ePackCmd)
 {
 	CURL *pCurl=NULL;
 	char szBuf[256] = {0};
@@ -264,7 +264,7 @@ static int GetPutProcess(char *pszUrl, char *pszAPIKey, char *pszJsonData, long 
 	struct curl_slist *ptHeaders=NULL;
     char szTemp[4096] = {0}; //unused
     
-	if ( (pszUrl == NULL) || (pszAPIKey == NULL)) {
+	if (pszUrl == NULL){
 		return OT_ERR_INVALID_PARAM;
 	}
     HidePromptWin();
@@ -278,11 +278,10 @@ static int GetPutProcess(char *pszUrl, char *pszAPIKey, char *pszJsonData, long 
     }
     if(glStartOfflineUploadMode == 1)
     {
-   		DisplayPrompt("OFFLINE FULL", "Processing offline transactions...", MSGTYPE_UPLOADING, 0);
+   		DisplayPrompt("PLEASE WAIT", "Processing offline transactions...", MSGTYPE_UPLOADING, 0);
     }	
 	spRetJson = pszRetJsonData;
 	PaxLog(LOG_INFO, "%s - %d pszUrl = %s", __FUNCTION__, __LINE__, pszUrl);
-	PaxLog(LOG_INFO, "%s - %d pszAPIKey = %s", __FUNCTION__, __LINE__, pszAPIKey);
 	if(CMD_UPLOAD_DATA == ePackCmd)
 	{
 		PaxLog(LOG_INFO, "%s - %d new upload pszJsonData = %s", __FUNCTION__, __LINE__, pszJsonData);
@@ -293,7 +292,7 @@ static int GetPutProcess(char *pszUrl, char *pszAPIKey, char *pszJsonData, long 
 		return OT_ERR;
 	}
 	curl_easy_setopt(pCurl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-	snprintf(szBuf, sizeof(szBuf) - 1, "%s%s", pszAPIKey, ":x");
+	snprintf(szBuf, sizeof(szBuf) - 1, "%s%s", "ZDI2YmZiODZkOTNhYzE4MjU1OGFlYjE4", ":x");
 	curl_easy_setopt(pCurl, CURLOPT_USERPWD, szBuf); //Your credentials goes here
 	curl_easy_setopt(pCurl, CURLOPT_URL, pszUrl);
 
@@ -315,7 +314,7 @@ static int GetPutProcess(char *pszUrl, char *pszAPIKey, char *pszJsonData, long 
 	}
 
 	curl_easy_setopt(pCurl, CURLOPT_VERBOSE, 1);	//debug
-	curl_easy_setopt(pCurl, CURLOPT_TIMEOUT, 20);
+	curl_easy_setopt(pCurl, CURLOPT_TIMEOUT, 30);
 
 	//for https
 	if ( strncmp(pszUrl, "https", 5) == 0 ) {
@@ -356,16 +355,11 @@ int RequestProcess(REQUESTCMD ePackCmd,int iUpdateJsonFlag)
 	char szJsonData[MAX_JASON_DATA];
 	char szTimeStamp[24];
 	char szRetJsonData[MAX_JASON_DATA];
-	char szAPIKey[128];
-
-
+	
 	memset(szUrl,0,sizeof(szUrl));
 	memset(szJsonData,0,sizeof(szJsonData));
 	memset(szTimeStamp,0,sizeof(szTimeStamp));
 	memset(szRetJsonData,0,sizeof(szRetJsonData));
-	memset(szAPIKey,0,sizeof(szAPIKey));
-
-	strcpy(szAPIKey,"ZDI2YmZiODZkOTNhYzE4MjU1OGFlYjE4"); //apiKey is fixed is this project
 	iUrlLen = GetRequestUrl(szUrl,sizeof(szUrl),ePackCmd);  //get URL to connect to back_end host
 	if(iUrlLen < 0)
 	{
@@ -381,8 +375,8 @@ int RequestProcess(REQUESTCMD ePackCmd,int iUpdateJsonFlag)
 	{
 		return OT_ERR;
 	}
-	
-	iRet = GetPutProcess(szUrl, szAPIKey, szJsonData, &lRetcode, szRetJsonData, ePackCmd);
+	  //handle put and put request
+	iRet = GetPutProcess(szUrl,szJsonData, &lRetcode, szRetJsonData, ePackCmd);
 	if(iRet)
 	{
 		if(ePackCmd == CMD_UPLOAD_DATA && glStartOfflineUploadMode == 0)

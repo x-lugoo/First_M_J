@@ -339,7 +339,6 @@ void BeepPrompt(char cFlag)
 static void DisplayTitle(const char *psztitle)
 {
 	char* szOrdLogoFile = "./res/ordrestyring_logo.png";
-//	XuiImg *imgOrdLogo = NULL;
 	int iTitleHeight=0;
 	int iStrWidth=0;
 	int iStrX=0, iStrY=0;
@@ -639,11 +638,6 @@ int GetFormantAmount(double* amount)
 
 	iRetKey = GetInput(&stVoiceNumInputBox);
 	if(iRetKey == XUI_KEYCANCEL){
-		//do cleaning
-		//XuiClearArea(XuiRootCanvas(), 0, 0, XuiRootCanvas()->width, XuiRootCanvas()->height);
-		//XuiShowWindow(pNextBnt  , 0, 0);
-		//XuiDestroyWindow(pNextBnt);
-		//XuiImgFree(imgDottedline);
 		*amount = 0;
 		goto clean;
 	}

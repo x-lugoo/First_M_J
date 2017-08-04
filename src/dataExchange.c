@@ -21,7 +21,7 @@ char *glCurrencyName = "DKK"; //init current,but get from mainapp
 extern double settle_product_vat();
 extern double product_node_get_vat(FNODE_T *node);
 
-int GetDataFromNodeStruc(void)
+int GetDataFromNodeStruc(void)   //get selected product messages.
 {
 	int iProductCount;
 	uchar pszformatAmount[30];
@@ -53,7 +53,7 @@ int GetDataFromNodeStruc(void)
 }
 
 
-int menu_exec(MENU_SELECTION menuStat){
+int menu_exec(MENU_SELECTION menuStat){   //handle selecting products
 
 	int iPayKeyRet = 0;
 	int stat = 0;
@@ -366,7 +366,7 @@ int SaveFile(const char *pszFileName,const void *psData,int iDataLen)
 		return FILE_ERR_OPEN_FAIL;
 	}
 
-	iLen = write(iFd,psData, iDataLen); //for safe write
+	iLen = write(iFd,psData, iDataLen); 
 	if(iLen < 0)
 	{
 		return FILE_ERR_WRITE_FAIL;
@@ -560,21 +560,21 @@ int ProcessStartUp(void)
 			return iRet;
 		}
 	}
-	iRet = menu_exec(stat_main_menu);
+	iRet = menu_exec(stat_main_menu); //handle selecting products
 	if(iRet)
 	{	
 		PaxLog(LOG_DEBUG,"menu_exec,iRet=%d,fun:%s_line:%d",
 							iRet,__FUNCTION__,__LINE__);
 		return iRet;
 	}
-	iRet = GetDataFromNodeStruc();
+	iRet = GetDataFromNodeStruc();//get selected product messages.
 	if(iRet)
 	{	
 		PaxLog(LOG_DEBUG,"GetDataFromNodeStruc,iRet=%d,fun:%s_line:%d",
 							iRet,__FUNCTION__,__LINE__);
 		return iRet;
 	}
-	iRet = SaveProductDataMiniposData();
+	iRet = SaveProductDataMiniposData();//save gotten messages,and prepare for MAINAPP start minipos again.
 	if(iRet)
 	{	
 		PaxLog(LOG_DEBUG,"SaveProductData_MiniposData,iRet=%d,fun:%s_line:%d",
@@ -583,6 +583,12 @@ int ProcessStartUp(void)
 	}
 	return 0;
 }
+void StartUploadOffline()
+{
+
+	glStartOfflineUploadMode = 1;
+}
+
 
 int ProcessPaymentResult(PAYMENT_RESULT paymentResult)
 {
@@ -603,26 +609,26 @@ int ProcessPaymentResult(PAYMENT_RESULT paymentResult)
 			if(iRet)
 			{
 				PaxLog(LOG_INFO, "RequestProcess iRet=%d %s - %d ",iRet, __FUNCTION__, __LINE__);
-				DisplayPrompt("FAIL", "Upload Order Product Fail" ,MSGTYPE_FAILURE, 0);
+				DisplayPrompt("CONNECTION ERROR", "Transaction stored offline" ,MSGTYPE_FAILURE, 0);
 				HidePromptWin();
 				break;
 				
 			}
-			iRet = PrintReceipt(glOrderAllProduct.orderLine,glOrderAllProduct.orderQuantity);
+			iRet = PrintReceipt(glOrderAllProduct.orderLine,glOrderAllProduct.orderQuantity,glMainAppData.ticketPrintEnabled);
 			if(iRet)
 			{	
 				PaxLog(LOG_DEBUG,"PrintReceipt,iRet=%d,fun:%s_line:%d",
 									iRet,__FUNCTION__,__LINE__);
 				return iRet;
 			}
-		
+			StartUploadOffline(); //if last transaction upload success, will start uploading offline products mode.
 			iRet = ProcessStartUp();
 			if(iRet)
 			{
 				return iRet;
 			}
 			break;
-		 default:
+		 default:   //if MAINAPP sends transcation cancel or other transaction fail messages
 			for(i = 0;i < glOrderAllProduct.orderQuantity;i++)
 			{
 				for(j = 0;j < product_list_node_count();j++)

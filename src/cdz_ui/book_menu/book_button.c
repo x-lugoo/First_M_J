@@ -111,7 +111,7 @@ int book_keypad_btn_back_refresh()
 		XuiShowWindow(btn,XUI_SHOW,0);
 	}
 	else if(strcmp(stat.text,"Load") == 0)
-	{
+	{
 		stat.img=book_keypad_btn_update_img();//remove "Load" button temporary
 		stat.img_x= 0;
 		XuiShowWindow(btn,XUI_HIDE,0);

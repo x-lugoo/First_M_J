@@ -14,7 +14,7 @@ int main(void)
 	char szTerminalType[20];
 
 	InitDisplay();
-	PaxLogInit("log");
+	PaxLogInit("log"); //init log tag
 	glMiniPosData.wakeUpReason = MINI_WAKEUP_SHOWMENU; //init Miniposdata
     SaveMiniDataForMain(&glMiniPosData);
 	memset(szTerminalType,0,sizeof(szTerminalType));
@@ -49,10 +49,10 @@ int main(void)
 		 			DestroyDisplay();
 		 			return iRet;
 		 		}
-		 		else if(iRet && glUploadFailToMainScreenFlag == 1)
+		 		else if(iRet && glUploadFailToMainScreenFlag == 1)//if upload fail,will back to main screen and save it.
 		 		{
 		 			glUploadFailToMainScreenFlag = 0;
-		 		#if 1 //for implement upload offline product
+		 		      //for implement upload offline product
 		 			if(access(OFFSET_NUM_FILE,F_OK) < 0)
 					{
 						glOfflineNum = 0;
@@ -78,15 +78,14 @@ int main(void)
 	 					DestroyDisplay();
 	 					return iRet;
 	 				}
-		 			iRet = PrintReceipt(glOrderAllProduct.orderLine,glOrderAllProduct.orderQuantity);
+		 			iRet = PrintReceipt(glOrderAllProduct.orderLine,glOrderAllProduct.orderQuantity,glMainAppData.ticketPrintEnabled);
 					if(iRet)
 					{	
 						PaxLog(LOG_DEBUG,"PrintReceipt,iRet=%d,fun:%s_line:%d",
 											iRet,__FUNCTION__,__LINE__);
 						return iRet;
 					}
-		 		#endif
-		 			iRet = ProcessStartUp();
+		 			iRet = ProcessStartUp(); //back to main screen/selecting products
 			 		if(iRet == START_SHOW_MAINAPP_MENU) //press func key
 			 		{
 			 			PaxLog(LOG_INFO,"---Checked the function key---fun:%s,line:%d",__FUNCTION__,__LINE__);
@@ -117,7 +116,7 @@ int main(void)
 						return iRet;
 					}
 		 		}
-		 		iRet = ProcessStartUp();
+		 		iRet = ProcessStartUp();//enter page of selecting products
 		 		if(iRet == START_SHOW_MAINAPP_MENU) //press func key
 		 		{
 		 			PaxLog(LOG_INFO,"---Checked the function key---fun:%s,line:%d",__FUNCTION__,__LINE__);

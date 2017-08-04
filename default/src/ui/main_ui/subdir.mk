@@ -4,10 +4,20 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/ui/main_ui/sm_menu_config.c 
+../src/ui/main_ui/sm_menu.c \
+../src/ui/main_ui/sm_menu_config.c \
+../src/ui/main_ui/sm_resource.c \
+../src/ui/main_ui/sm_save.c \
+../src/ui/main_ui/sm_tool.c \
+../src/ui/main_ui/sm_tree.c 
 
 OBJS += \
-./src/ui/main_ui/sm_menu_config.o 
+./src/ui/main_ui/sm_menu.o \
+./src/ui/main_ui/sm_menu_config.o \
+./src/ui/main_ui/sm_resource.o \
+./src/ui/main_ui/sm_save.o \
+./src/ui/main_ui/sm_tool.o \
+./src/ui/main_ui/sm_tree.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes

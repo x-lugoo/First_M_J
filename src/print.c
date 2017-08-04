@@ -54,7 +54,7 @@ int PrintBlank(int num)
 	return 0;
 }
 
-int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
+int PrintReceipt(struct _orderLine *orderLine,int orderLineNum,char ifPrintFlag)
 {
 	int iRet;
 	int i;
@@ -72,6 +72,11 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
     char  printShowVatBuff[30];
     ST_TIME curTime;
 
+    if(ifPrintFlag != '1')//if flag = '0',do not print receipt for saving transaction time.
+    {
+    	HidePromptWin();
+    	return 0;
+    }
     memset(&curTime,0,sizeof(ST_TIME));
 	memset(ucTotalAmount,0,sizeof(ucTotalAmount));
 	memset(printVatBuff,0,sizeof(printVatBuff));
@@ -103,7 +108,6 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
 	iRet = OsPrnOpen(PRN_REAL,NULL);
 	if(iRet)
 	{
-		//InitDisplay();
 		DisplayPrompt("ERROR", "PRINT FAIL", MSGTYPE_WARNING, 0);
 		HidePromptWin();
 		PaxLog(LOG_INFO,"prnOpen,iRet=%d",iRet);
@@ -220,7 +224,6 @@ int PrintReceipt(struct _orderLine *orderLine,int orderLineNum)
          }
 		else
 		{
-			//InitDisplay();
 			DisplayPrompt("ERROR", "PRINT FAIL", MSGTYPE_FAILURE, 0);
 			HidePromptWin();
 		}

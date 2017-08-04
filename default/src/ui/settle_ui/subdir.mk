@@ -4,9 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../src/ui/settle_ui/settle_ui.c \
+../src/ui/settle_ui/sm_settle.c \
 ../src/ui/settle_ui/sm_ui_config.c 
 
 OBJS += \
+./src/ui/settle_ui/settle_ui.o \
+./src/ui/settle_ui/sm_settle.o \
 ./src/ui/settle_ui/sm_ui_config.o 
 
 

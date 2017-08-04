@@ -1,6 +1,6 @@
 #ifndef SM_ALL_H
 #define SM_ALL_H
-#include "Sm_all.h"
+
 #define __PROLIN__
 
 typedef struct family_node_t FNODE_T;
@@ -30,13 +30,6 @@ int page_code_ensure();
 int settle_menu_process_get_value();
 int page_code_back();
 int page_code_ensure();
-typedef enum
-{
-	stat_main_menu,
-	stat_settle_menu,
-	stat_exit,
-	stat_payment_menu,
-	
-}MENU_SELECTION;
+
 
 #endif//SM_ALL_H
